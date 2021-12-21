@@ -4,7 +4,7 @@
 
 # Subtasks 
 Research Question <br>
-- [ ] Write understading and clear research question
+- [X] Write understading and clear research question
 - [ ] Research assumption
 
 Learning <br>
