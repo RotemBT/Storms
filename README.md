@@ -4,36 +4,36 @@
 
 # Subtasks 
 Research Question <br>
-[ ] Write understading and clear research question
-[ ] Research assumption
+- [ ] Write understading and clear research question
+- [ ] Research assumption
 
 Learning <br>
-[ ] BS4 - beautiful soup
-[ ] Selenium
+- [ ] BS4 - beautiful soup
+- [ ] Selenium
 
 Crawling <br>
-[ ] Crawling from wunderground
-[ ] Crawling from wikipedia
-[ ] Crawling from ncdc
-[ ] Crawling from ncei
-[ ] Crawlimg from data.world?
+- [ ] Crawling from wunderground
+- [ ] Crawling from wikipedia
+- [ ] Crawling from ncdc
+- [ ] Crawling from ncei
+- [ ] Crawlimg from data.world?
 
 Data handling <br>
-[ ] Handling Empty spaces
-[ ] Handling Duplicates
-[ ] Handling Outliers
+- [ ] Handling Empty spaces
+- [ ] Handling Duplicates
+- [ ] Handling Outliers
 
 EDA  <br>
-[ ] Find the best graph to visualize our data
-[ ] Visualize our data using graphs
+- [ ] Find the best graph to visualize our data
+- [ ] Visualize our data using graphs
 
 Machine Learning Model  <br>
-[ ] Analyse our data and params
-[ ] Find the best way to build our model
-[ ] Get the result
+- [ ] Analyse our data and params
+- [ ] Find the best way to build our model
+- [ ] Get the result
 
 # Project requirements:
-[ ] Presentation
-[ ] Video
-[ ] Wow Effect
-[ ] Summary
+- [ ] Presentation
+- [ ] Video
+- [ ] Wow Effect
+- [ ] Summary
