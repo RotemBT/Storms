@@ -21,7 +21,7 @@ def crawling_table():
     storms = []
     maxWinds = []
     minPressure = []
-    maxStrength = []
+    storm_type = []
     storms_names = []
     hurricanes = []
     deaths = []
@@ -53,12 +53,24 @@ def crawling_table():
             tdOfMaxStrength = bs.find_all('td',{'class':'mat-cell cdk-cell cdk-column-maximumStormType mat-column-maximumStormType ng-star-inserted'})
             for i in tdStormsNames:
                 storms_names.append(i.find('a').text)
+
             for i in toOfMaxWinds:
-                maxWinds.append(int(i.find('span').text))
+                try:
+                    maxWinds.append(int(i.find('span').text))
+                except:
+                    maxWinds.append(0)
+            print(maxWinds)
+                
             for i in tdOfMinPressure:
-                minPressure.append(int(i.find('span').text))
+                #print(i.find('span').text)
+                try:
+                    minPressure.append(i.find('span').text)
+                except:
+                    minPressure.append(0)
+            print(minPressure)
+
             for i in tdOfMaxStrength:
-                maxStrength.append(i.text)
+                storm_type.append(i.text)
 
         for td in tdOfStorm:
             storms.append(td.find('span').text)
@@ -70,10 +82,12 @@ def crawling_table():
             damanged_usd.append(td.find('span').text)
 
         driver.close()
-    d = {'years': years, 'storms': storms, 'hurricanes': hurricanes, 'death': deaths, 'damanged_usd': damanged_usd,
-         }
+    d = {'years': years, 'storms': storms, 'hurricanes': hurricanes, 'death': deaths, 'damanged_usd': damanged_usd}
+    d2 = {'storms_names': storms_names, 'max_winds':maxWinds, 'max_strength':storm_type}
     df = pd.DataFrame(data=d)
+    df2 = pd.DataFrame(data=d2)
     print(df)
+    print(df2)
     df.to_csv('storms_df.csv')
 
 
