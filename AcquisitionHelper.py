@@ -1,6 +1,6 @@
 import bs4
 import requests
-
+import pandas as pd
 
 # constants
 LAST_YEAR = 2021
@@ -162,7 +162,7 @@ def scrapFromWUnderground(years, oceans, dates, times, windPower, airPressure,
         'Central Pacific': "https://www.wunderground.com/hurricane/archive/CP",
         'Southern Hemisphere': "https://www.wunderground.com/hurricane/archive/SH"
     }
-    for ocean, url in oceansURL:
+    for ocean, url in oceansURL.items():
         soup = urlToScrap(url)
         tdOfYear = soup.find_all('td',
                                  class_='mat-cell cdk-cell cdk-column-year mat-column-year ng-star-inserted')
@@ -193,8 +193,12 @@ def scrapFromWUnderground(years, oceans, dates, times, windPower, airPressure,
                                       class_='mat-cell cdk-cell cdk-column-designatedTrack '
                                              'mat-column-designatedTrack ng-star-inserted')
         for year in range(FIRST_YEAR, LAST_YEAR):
-            soupYear = urlToScrap(url + '/' + year)
+            soupYear = urlToScrap(url + '/' + str(year))
             storms = soupYear.find_all('tr', class_='mat-row cdk-row ng-star-inserted')
             for storm in storms:
                 getStormInformation(storm, ocean, year, years, oceans, dates, times, windPower, airPressure,
                                     stormType, stormNames, latCorr, longCorr)
+    print(pd.DataFrame({'storm_name':stormNames, 'year':years, 'date':dates, 'time':times, 'wind_power':windPower,
+                  'air_pressure':airPressure,'storm_type':stormType,'lat':latCorr,'long':longCorr}))
+
+
