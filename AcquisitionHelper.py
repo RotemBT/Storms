@@ -105,7 +105,7 @@ def scrapFromWUnderground(years, oceans, dates, times, windPower, airPressure,
                                      .find('span').text)
                 else:
                     stormLink = storm.find('a', href=True)
-                    soupStorm = urlToScrap(stormLink)
+                    soupStorm = urlToScrap(stormLink['href'])
                     measurements = soupStorm.find_all('tr', class_='mat-row cdk-row ng-star-inserted')
                     for measurement in measurements:
                         oceans.append(ocean)
