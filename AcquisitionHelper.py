@@ -1,7 +1,6 @@
 import bs4
 import requests
-import pandas as pd
-import time
+
 
 # constants
 LAST_YEAR = 2021
@@ -10,6 +9,11 @@ FIRST_YEAR = 1851
 
 # Return bs4 instance
 def urlToScrap(url):
+    """
+    get instance of soup to scarp from current url
+    :param url: url to scrap
+    :return: instance of soup
+    """
     r = requests.get(url)
     return bs4.BeautifulSoup(r.content, 'html.parser')
 
@@ -17,6 +21,21 @@ def urlToScrap(url):
 # Crawling from wikipedia
 def scrapFromWiki(yearCurr, soup, stormName, datesActive, stormCategory, maxMinWind, minPressure,
                   damageUSD, deaths, year):
+    """
+    this function scrap from wikipedia.
+    link - https://en.wikipedia.org/wiki/Atlantic_hurricane_season
+    :param yearCurr: current year of storm
+    :param soup: get
+    :param stormName:
+    :param datesActive:
+    :param stormCategory:
+    :param maxMinWind:
+    :param minPressure:
+    :param damageUSD:
+    :param deaths:
+    :param year:
+    :return:
+    """
     ourTable = soup.find_all('table', class_='wikitable')
     trs = ourTable[-1].find_all("tr")
     for tr in trs[1:-2]:
@@ -32,37 +51,55 @@ def scrapFromWiki(yearCurr, soup, stormName, datesActive, stormCategory, maxMinW
         year.append(str(yearCurr))
 
 
-def getStormInformation(storm, ocean, year, years, oceans, dates, times, windPower, airPressure,
-                          stormType, stormNames, latCorr, longCorr):
-    stormName = storm.find('td', class_='mat-cell cdk-cell cdk-column-summaryStormName'
+def getStormInformation(stormSoup, ocean, year, years, oceans, dates, times, windPower, airPressure,
+                        stormType, stormNames, latCorr, longCorr):
+    """
+   this function scrap from wunderground web, scrap the measurements of every storm.
+    link - https://www.wunderground.com/hurricane/archive
+    :param stormSoup: get instance of soup
+    :param ocean: get ocean of current storm
+    :param year: get year of current storm
+    :param years: list of years of storms
+    :param oceans: list of oceans of storms
+    :param dates: list of date of storms
+    :param times: list of time of every single measurement of storm
+    :param windPower: list of wind power of every single measurement of storm
+    :param airPressure: list of air pressure of every single measurement of storm
+    :param stormType: list of storm type of storm
+    :param stormNames: list of storms name
+    :param latCorr: list of latitude of storms
+    :param longCorr: list of longitude of storms
+    :return: for now nothing
+    """
+    stormName = stormSoup.find('td', class_='mat-cell cdk-cell cdk-column-summaryStormName'
                                         ' mat-column-summaryStormName ng-star-inserted').find('a').text
     # If the name of the storm is not-named there is no measurement
     if stormName == 'NOT_NAMED':
         years.append(year)
         oceans.append(ocean)
-        dates.append(storm.find('td', class_="mat-cell cdk-cell cdk-column-designatedTrack"
+        dates.append(stormSoup.find('td', class_="mat-cell cdk-cell cdk-column-designatedTrack"
                                              " mat-column-designatedTrack ng-star-inserted")
                      .find('span').text)
         try:
-            windPower.append(storm.find('td', class_='mat-cell cdk-cell '
+            windPower.append(stormSoup.find('td', class_='mat-cell cdk-cell '
                                                      'cdk-column-highestMaximumSustainedWind '
                                                      'mat-column-highestMaximumSustainedWind'
                                                      ' ng-star-inserted').find('span').text)
         except:
             windPower.append(0)
         try:
-            airPressure.append(storm.find('td', class_='mat-cell cdk-cell cdk-column-lowestMinimumPressure'
+            airPressure.append(stormSoup.find('td', class_='mat-cell cdk-cell cdk-column-lowestMinimumPressure'
                                                        ' mat-column-lowestMinimumPressure ng-star-inserted')
                                .find('span').text)
         except:
             airPressure.append(0)
 
-        stormType.append(storm.find('td', class_="mat-cell cdk-cell cdk-column-maximumStormType"
+        stormType.append(stormSoup.find('td', class_="mat-cell cdk-cell cdk-column-maximumStormType"
                                                  " mat-column-maximumStormType ng-star-inserted")
                          .find('span').text)
     # else There is measurement
     else:
-        stormLink = storm.find('a', href=True)
+        stormLink = stormSoup.find('a', href=True)
         soupStorm = urlToScrap(stormLink['href'])
         measurements = soupStorm.find_all('tr', class_='mat-row cdk-row ng-star-inserted')
         for measurement in measurements:
@@ -101,6 +138,21 @@ def getStormInformation(storm, ocean, year, years, oceans, dates, times, windPow
 # Crawling from Wunderground
 def scrapFromWUnderground(years, oceans, dates, times, windPower, airPressure,
                           stormType, stormNames, latCorr, longCorr):
+    """
+    this function scrap from wunderground web, scrap every year and than the measurement of every storm.
+    link - https://www.wunderground.com/hurricane/archive
+    :param years: list of years of storms
+    :param oceans: list of oceans of storms
+    :param dates: list of date of storms
+    :param times: list of time of every single measurement of storm
+    :param windPower: list of wind power of every single measurement of storm
+    :param airPressure: list of air pressure of every single measurement of storm
+    :param stormType: list of storm type of storm
+    :param stormNames: list of storms name
+    :param latCorr: list of latitude of storms
+    :param longCorr: list of longitude of storms
+    :return: for now nothing
+    """
     # URL and name of the oceans
     oceansURL = {
         'Atlantic Ocean': "https://www.wunderground.com/hurricane/archive/AL",
