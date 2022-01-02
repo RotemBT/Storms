@@ -32,6 +32,73 @@ def scrapFromWiki(yearCurr, soup, stormName, datesActive, stormCategory, maxMinW
         year.append(str(yearCurr))
 
 
+def getStormInformation(storm, ocean, year, years, oceans, dates, times, windPower, airPressure,
+                          stormType, stormNames, latCorr, longCorr):
+    stormName = storm.find('td', class_='mat-cell cdk-cell cdk-column-summaryStormName'
+                                        ' mat-column-summaryStormName ng-star-inserted').find('a').text
+    # If the name of the storm is not-named there is no measurement
+    if stormName == 'NOT_NAMED':
+        years.append(year)
+        oceans.append(ocean)
+        dates.append(storm.find('td', class_="mat-cell cdk-cell cdk-column-designatedTrack"
+                                             " mat-column-designatedTrack ng-star-inserted")
+                     .find('span').text)
+        try:
+            windPower.append(storm.find('td', class_='mat-cell cdk-cell '
+                                                     'cdk-column-highestMaximumSustainedWind '
+                                                     'mat-column-highestMaximumSustainedWind'
+                                                     ' ng-star-inserted').find('span').text)
+        except:
+            windPower.append(0)
+        try:
+            airPressure.append(storm.find('td', class_='mat-cell cdk-cell cdk-column-lowestMinimumPressure'
+                                                       ' mat-column-lowestMinimumPressure ng-star-inserted')
+                               .find('span').text)
+        except:
+            airPressure.append(0)
+
+        stormType.append(storm.find('td', class_="mat-cell cdk-cell cdk-column-maximumStormType"
+                                                 " mat-column-maximumStormType ng-star-inserted")
+                         .find('span').text)
+    # else There is measurement
+    else:
+        stormLink = storm.find('a', href=True)
+        soupStorm = urlToScrap(stormLink['href'])
+        measurements = soupStorm.find_all('tr', class_='mat-row cdk-row ng-star-inserted')
+        for measurement in measurements:
+            oceans.append(ocean)
+            years.append(year)
+            stormNames.appand(stormName)
+            dates.append(measurement.find('td', class_='mat-cell cdk-cell cdk-column-date '
+                                                       'mat-column-date ng-star-inserted')
+                         .find('span').text)
+            times.append(measurement.find('td', class_='mat-cell cdk-cell cdk-column-time'
+                                                       ' mat-column-time ng-star-inserted')
+                         .find('span').text)
+            latCorr.append(measurement.find('td', class_='mat-cell cdk-cell cdk-column-lat'
+                                                         ' mat-column-lat ng-star-inserted')
+                           .find('span').text)
+            longCorr.append(measurement.find('td', class_='mat-cell cdk-cell cdk-column-lon'
+                                                          ' mat-column-lon ng-star-inserted')
+                            .find('span').text)
+            try:
+                windPower.append(measurement.find('td', class_='mat-cell cdk-cell cdk-column-wind'
+                                                               ' mat-column-wind ng-star-inserted')
+                                 .find('span').text)
+            except:
+                windPower.append(0)
+            try:
+                airPressure.append(measurement.find('td', class_='mat-cell cdk-cell cdk-column-pressure'
+                                                                 ' mat-column-pressure ng-star-inserted')
+                                   .find('span').text)
+            except:
+                airPressure.append(0)
+            stormType.append(measurement.find('td', class_='mat-cell cdk-cell cdk-column-type'
+                                                           ' mat-column-type ng-star-inserted')
+                             .find('span').text)
+
+
+# Crawling from Wunderground
 def scrapFromWUnderground(years, oceans, dates, times, windPower, airPressure,
                           stormType, stormNames, latCorr, longCorr):
     # URL and name of the oceans
@@ -77,64 +144,5 @@ def scrapFromWUnderground(years, oceans, dates, times, windPower, airPressure,
             soupYear = urlToScrap(url + '/' + year)
             storms = soupYear.find_all('tr', class_='mat-row cdk-row ng-star-inserted')
             for storm in storms:
-                stormName = storm.find('td', class_='mat-cell cdk-cell cdk-column-summaryStormName'
-                                                    ' mat-column-summaryStormName ng-star-inserted').find('a').text
-                # If the name of the storm is not-named there is no measurement
-                if stormName == 'NOT_NAMED':
-                    years.append(year)
-                    oceans.append(ocean)
-                    dates.append(storm.find('td', class_="mat-cell cdk-cell cdk-column-designatedTrack"
-                                                         " mat-column-designatedTrack ng-star-inserted")
-                                 .find('span').text)
-                    try:
-                        windPower.append(storm.find('td', class_='mat-cell cdk-cell '
-                                                                'cdk-column-highestMaximumSustainedWind '
-                                                                'mat-column-highestMaximumSustainedWind'
-                                                                ' ng-star-inserted').find('span').text)
-                    except:
-                        windPower.append(0)
-                    try:
-                        airPressure.append(storm.find('td', class_='mat-cell cdk-cell cdk-column-lowestMinimumPressure'
-                                                                   ' mat-column-lowestMinimumPressure ng-star-inserted')
-                                           .find('span').text)
-                    except:
-                        airPressure.append(0)
-
-                    stormType.append(storm.find('td', class_="mat-cell cdk-cell cdk-column-maximumStormType"
-                                                             " mat-column-maximumStormType ng-star-inserted")
-                                     .find('span').text)
-                else:
-                    stormLink = storm.find('a', href=True)
-                    soupStorm = urlToScrap(stormLink['href'])
-                    measurements = soupStorm.find_all('tr', class_='mat-row cdk-row ng-star-inserted')
-                    for measurement in measurements:
-                        oceans.append(ocean)
-                        years.append(year)
-                        stormNames.appand(stormName)
-                        dates.append(measurement.find('td', class_='mat-cell cdk-cell cdk-column-date '
-                                                                   'mat-column-date ng-star-inserted')
-                                     .find('span').text)
-                        times.append(measurement.find('td', class_='mat-cell cdk-cell cdk-column-time'
-                                                                   ' mat-column-time ng-star-inserted')
-                                     .find('span').text)
-                        latCorr.append(measurement.find('td', class_='mat-cell cdk-cell cdk-column-lat'
-                                                                     ' mat-column-lat ng-star-inserted')
-                                       .find('span').text)
-                        longCorr.append(measurement.find('td', class_='mat-cell cdk-cell cdk-column-lon'
-                                                                      ' mat-column-lon ng-star-inserted')
-                                        .find('span').text)
-                        try:
-                            windPower.append(measurement.find('td', class_='mat-cell cdk-cell cdk-column-wind'
-                                                                          ' mat-column-wind ng-star-inserted')
-                                             .find('span').text)
-                        except:
-                            windPower.append(0)
-                        try:
-                            airPressure.append(measurement.find('td', class_='mat-cell cdk-cell cdk-column-pressure'
-                                                                             ' mat-column-pressure ng-star-inserted')
-                                               .find('span').text)
-                        except:
-                            airPressure.append(0)
-                        stormType.append(measurement.find('td', class_='mat-cell cdk-cell cdk-column-type'
-                                                                       ' mat-column-type ng-star-inserted')
-                                         .find('span').text)
+                getStormInformation(storm, ocean, year, years, oceans, dates, times, windPower, airPressure,
+                                    stormType, stormNames, latCorr, longCorr)
