@@ -22,6 +22,7 @@ def getStormRecords(soup, year, ocean, years, oceans, dates, hours, windPower, a
     time.sleep(2)
     stormName = driver.find_element(By.CLASS_NAME, 'sub-header').text
     stormName = stormName.split(' ')[1]
+    stormName = 'NOT_NAMED' if stormName == 'NOT' else stormName
     try:
         rows = soup.find('tbody').find_all('tr')
     except:
@@ -83,9 +84,6 @@ def scrapDataFromCurrYear(year, ocean, years, oceans, dates, hours, windPower, a
             windPower.append(columns[2].text)
             airPressure.append(columns[3].text)
             stormType.append(columns[4].text)
-    print(pd.DataFrame({'storm_name': stormNames, 'oceans': ocean, 'year': years, 'date': dates, 'time': hours,
-                        'wind_power': windPower,
-                        'air_pressure': airPressure, 'storm_type': stormType, 'lat': latCorr, 'long': longCorr}))
 
 
 yearOfStorm = []
@@ -106,5 +104,9 @@ driver = webdriver.Chrome(service=s)
 for i in range(2005, 2021):
     scrapDataFromCurrYear(i, 'Atlantic Ocean', yearOfStorm, oceans, dates, hours, windPower, airPressure,
                           stormType, stormsName, latCorr, longCorr)
+print(pd.DataFrame({'storm_name': stormsName, 'oceans': oceans, 'year': yearOfStorm, 'date': dates, 'time': hours,
+                        'wind_power': windPower,
+                        'air_pressure': airPressure, 'storm_type': stormType, 'lat': latCorr, 'long': longCorr}))
+
 
 driver.quit()
