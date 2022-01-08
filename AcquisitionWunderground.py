@@ -1,4 +1,28 @@
+import time
+
 from AcquisitionHelper import *
+import itertools
+
+
+def xpath_soup(element):
+    """
+    Generate xpath of soup element
+    :param element: bs4 text or node
+    :return: xpath as string
+    """
+    components = []
+    child = element if element.name else element.parent
+    for parent in child.parents:
+        """
+        @type parent: bs4.element.Tag
+        """
+        previous = itertools.islice(parent.children, 0, parent.contents.index(child))
+        xpath_tag = child.name
+        xpath_index = sum(1 for i in previous if i.name == xpath_tag) + 1
+        components.append(xpath_tag if xpath_index == 1 else '%s[%d]' % (xpath_tag, xpath_index))
+        child = parent
+    components.reverse()
+    return '/%s' % '/'.join(components)
 
 
 def getStormRecords(soup, year, ocean, years, oceans, dates, hours, windPower, airPressure,
@@ -92,9 +116,17 @@ def scrapDataFromCurrYear(year, ocean, years, oceans, dates, hours, windPower, a
                 'class': 'mat-cell cdk-cell cdk-column-summaryStormName mat-column-summaryStormName ng-star-inserted'})
             stormsLink = [s.find('a') for s in tdOfStorm]
             for i in range(1, len(stormsLink)):
+                driver.get(url)
+                time.sleep(3)
+                xpath = xpath_soup(stormsLink[i])
                 nextStorm = stormsLink[i]
+                print(nextStorm.text)
+                if (nextStorm.text == ' NOT_NAMED '):
+                    getInfoOfRow(rows[i], year, ocean, years, oceans, dates, hours, windPower, airPressure,
+                                 stormType, stormNames, latCorr, longCorr)
+                    continue
                 # moving to next page by clicking on link text (with selenium)
-                element = driver.find_element(By.XPATH, "//*[contains(text(), '" + str(nextStorm.text) + "')]")
+                element = driver.find_element(By.XPATH, xpath)
                 element.click()
                 driver.get(driver.current_url)
                 c = driver.page_source
@@ -105,12 +137,12 @@ def scrapDataFromCurrYear(year, ocean, years, oceans, dates, hours, windPower, a
                                     stormType, stormNames, latCorr, longCorr)
                 else:
                     driver.get(url)
+                    time.sleep(3)
                     c = driver.page_source
                     soup = bs4.BeautifulSoup(c, "html.parser")
                     rows = soup.find('tbody').find_all('tr')
                     getInfoOfRow(rows[i], year, ocean, years, oceans, dates, hours, windPower, airPressure,
                                  stormType, stormNames, latCorr, longCorr)
-
     else:
         driver.get(driver.current_url)
         c = driver.page_source
@@ -120,20 +152,16 @@ def scrapDataFromCurrYear(year, ocean, years, oceans, dates, hours, windPower, a
         except:
             rows = []
         for row in rows:
-            columns = row.find_all('td')
-            startDate = str(columns[1].text).split(' - ')[1] + '/' + str(year)
-            years.append(year)
-            oceans.append(ocean)
-            stormNames.append(columns[0].text)
-            dates.append(startDate)
-            hours.append('12:00:00 PM')
-            latCorr.append(np.nan)
-            longCorr.append(np.nan)
-            windPower.append(columns[2].text)
-            airPressure.append(columns[3].text)
-            stormType.append(columns[4].text)
+            getInfoOfRow(row, year, ocean, years, oceans, dates, hours, windPower, airPressure,
+                         stormType, stormNames, latCorr, longCorr)
 
 
+def scrapData():
+    for ocean, url in oceansURL.items():
+        for i in range(2021, 1851, -1):
+            scrapDataFromCurrYear(i, ocean, yearOfStorm, oceans, dates, hours, windPower, airPressure,
+                                  stormType, stormsName, latCorr, longCorr, url)
+start = time.time()
 yearOfStorm = []
 oceans = []
 dates = []
@@ -149,19 +177,10 @@ damagedUsd = []
 s = Service("C:/Program Files/chromeDriver/chromedriver.exe")
 driver = webdriver.Chrome(service=s)
 
-
-def scrapData():
-    for ocean, url in oceansURL.items():
-        for i in range(2021, 2020, -1):
-            scrapDataFromCurrYear(i, ocean, yearOfStorm, oceans, dates, hours, windPower, airPressure,
-                                  stormType, stormsName, latCorr, longCorr, url)
-
-
-scrapDataFromCurrYear(2021, 'WP', yearOfStorm, oceans, dates, hours, windPower, airPressure,
-                      stormType, stormsName, latCorr, longCorr,
-                      'https://www.wunderground.com/hurricane/archive/WP')
-print(pd.DataFrame({'storm_name': stormsName, 'oceans': oceans, 'year': yearOfStorm, 'date': dates, 'time': hours,
-                    'wind_power': windPower,
-                    'air_pressure': airPressure, 'storm_type': stormType, 'lat': latCorr, 'long': longCorr}))
-
+scrapData()
+df = pd.DataFrame({'storm_name': stormsName, 'oceans': oceans, 'year': yearOfStorm, 'date': dates, 'time': hours,
+                   'wind_power': windPower,
+                   'air_pressure': airPressure, 'storm_type': stormType, 'lat': latCorr, 'long': longCorr})
+df.to_csv('storms.csv')
 driver.quit()
+print(f'The time to scrap from Wunderground is : {time.time() - start}')
