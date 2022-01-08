@@ -1,12 +1,4 @@
 from AcquisitionHelper import *
-oceansURL = {
-    'Atlantic Ocean': "https://www.wunderground.com/hurricane/archive/AL",
-    'East Pacific': "https://www.wunderground.com/hurricane/archive/EP",
-    'Western Pacific': "https://www.wunderground.com/hurricane/archive/WP",
-    'Indian Ocean': "https://www.wunderground.com/hurricane/archive/IO",
-    'Central Pacific': "https://www.wunderground.com/hurricane/archive/CP",
-    'Southern Hemisphere': "https://www.wunderground.com/hurricane/archive/SH"
-}
 
 yearOfStorm = []
 oceans = []
@@ -22,5 +14,6 @@ deaths = []
 damagedUsd = []
 scrapGeneralInformationOfOcean(oceansURL)
 
-# scrapFromWUnderground(yearOfStorm, oceans, dates, hours, windPower, airPressure,
-                      #stormType, stormsName, latCorr, longCorr)
+for i in range(2021, 1851, -1):
+    scrapDataFromCurrYear(i, 'Atlantic Ocean', yearOfStorm, oceans, dates, hours, windPower, airPressure,
+                          stormType, stormsName, latCorr, longCorr)
