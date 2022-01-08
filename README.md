@@ -4,19 +4,16 @@
 
 # Subtasks 
 Research Question <br>
-- [ ] Write understading and clear research question
-- [ ] Research assumption
+- [X] Write understading and clear research question
+- [X] Research assumption
 
 Learning <br>
-- [ ] BS4 - beautiful soup
-- [ ] Selenium
+- [X] BS4 - beautiful soup
+- [X] Selenium
 
 Crawling <br>
-- [ ] Crawling from wunderground
-- [ ] Crawling from wikipedia
-- [ ] Crawling from ncdc
-- [ ] Crawling from ncei
-- [ ] Crawlimg from data.world?
+- [X] Crawling from wunderground
+- [X] Crawling from wikipedia
 
 Data handling <br>
 - [ ] Handling Empty spaces
