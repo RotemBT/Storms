@@ -1,6 +1,5 @@
 # Storms
 
-# Here we manage our project in computer science
 
 # Subtasks 
 Research Question <br>
