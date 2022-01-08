@@ -18,6 +18,8 @@ oceansURL = {
 
 def getStormRecords(soup, year, ocean, years, oceans, dates, hours, windPower, airPressure,
                     stormType, stormNames, latCorr, longCorr):
+    # Sleep for wait for the dynamic page will be loaded.
+    time.sleep(2)
     stormName = driver.find_element(By.CLASS_NAME, 'sub-header').text
     stormName = stormName.split(' ')[1]
     rows = soup.find('tbody').find_all('tr')
