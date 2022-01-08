@@ -1,10 +1,23 @@
+import re
+
 import bs4
 import requests
 import pandas as pd
 
 # constants
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+
 LAST_YEAR = 2021
 FIRST_YEAR = 1851
+oceansURL = {
+    'Atlantic Ocean': "https://www.wunderground.com/hurricane/archive/AL",
+    'East Pacific': "https://www.wunderground.com/hurricane/archive/EP",
+    'Western Pacific': "https://www.wunderground.com/hurricane/archive/WP",
+    'Indian Ocean': "https://www.wunderground.com/hurricane/archive/IO",
+    'Central Pacific': "https://www.wunderground.com/hurricane/archive/CP",
+    'Southern Hemisphere': "https://www.wunderground.com/hurricane/archive/SH"
+}
 
 
 # Return bs4 instance
@@ -51,7 +64,7 @@ def scrapFromWiki(yearCurr, soup, stormName, datesActive, stormCategory, maxMinW
         year.append(str(yearCurr))
 
 
-def getStormInformation(stormSoup, ocean, year, years, oceans, dates, times, windPower, airPressure,
+def getStormInformation(stormSoup, ocean, year, years, oceans, dates, hours, windPower, airPressure,
                         stormType, stormNames, latCorr, longCorr):
     """
    this function scrap from wunderground web, scrap the measurements of every storm.
@@ -62,7 +75,7 @@ def getStormInformation(stormSoup, ocean, year, years, oceans, dates, times, win
     :param years: list of years of storms
     :param oceans: list of oceans of storms
     :param dates: list of date of storms
-    :param times: list of time of every single measurement of storm
+    :param hours: list of time of every single measurement of storm
     :param windPower: list of wind power of every single measurement of storm
     :param airPressure: list of air pressure of every single measurement of storm
     :param stormType: list of storm type of storm
@@ -110,7 +123,7 @@ def getStormInformation(stormSoup, ocean, year, years, oceans, dates, times, win
             dates.append(measurement.find('td', class_='mat-cell cdk-cell cdk-column-date '
                                                        'mat-column-date ng-star-inserted')
                          .find('span').text)
-            times.append(measurement.find('td', class_='mat-cell cdk-cell cdk-column-time'
+            hours.append(measurement.find('td', class_='mat-cell cdk-cell cdk-column-time'
                                                        ' mat-column-time ng-star-inserted')
                          .find('span').text)
             latCorr.append(measurement.find('td', class_='mat-cell cdk-cell cdk-column-lat'
@@ -136,8 +149,46 @@ def getStormInformation(stormSoup, ocean, year, years, oceans, dates, times, win
                              .find('span').text)
 
 
+def scrapGeneralInformationOfOcean(oceansURL):
+    years = []
+    storms = []
+    hurricanes = []
+    deaths = []
+    damagedUSD = []
+    oceans = []
+    for ocean, url in oceansURL.items():
+        s = Service("C:/Program Files/chromeDriver/chromedriver.exe")
+        driver = webdriver.Chrome(service=s)
+        driver.get(url)
+        c = driver.page_source
+        soup = bs4.BeautifulSoup(c, "html.parser")
+        tdOfYear = soup.find_all('td',
+                                 class_='mat-cell cdk-cell cdk-column-year mat-column-year ng-star-inserted')
+        tdOfStorm = soup.find_all('td',
+                                  class_='mat-cell cdk-cell cdk-column-storms mat-column-storms ng-star-inserted')
+        tdOHurricanes = soup.find_all('td',
+                                      class_='mat-cell cdk-cell cdk-column-hurricanes mat-column-hurricanes'
+                                             ' ng-star-inserted')
+        tdOfDeaths = soup.find_all('td',
+                                   class_='mat-cell cdk-cell cdk-column-deaths mat-column-deaths ng-star-inserted')
+        tdOfDamagedUsd = soup.find_all('td',
+                                       class_='mat-cell cdk-cell cdk-column-damage mat-column-damage ng-star-inserted')
+        tdOfDamagedUsd = [damage.text for damage in tdOfDamagedUsd]
+        tdOfDamagedUsd = [re.sub("[^0-9]", "", str(damage)) for damage in tdOfDamagedUsd]
+        tdOfDeaths= [deaths.text for deaths in tdOfDeaths]
+        tdOfDeaths =[re.sub("[^0-9]", "", str(deaths)) for deaths in tdOfDeaths]
+        years.extend([year.text for year in tdOfYear])
+        storms.extend([storm.text for storm in tdOfStorm])
+        hurricanes.extend([hurricane.text for hurricane in tdOHurricanes])
+        deaths.extend(tdOfDeaths)
+        damagedUSD.extend(tdOfDamagedUsd)
+        oceans.extend([ocean] * len(tdOfYear))
+    return pd.DataFrame({'Years': years, 'Storms': storms, 'Hurricanes': hurricanes, 'Deaths': deaths,
+                        'DamageUSD': damagedUSD, 'Oceans': oceans})
+
+
 # Crawling from Wunderground
-def scrapFromWUnderground(years, oceans, dates, times, windPower, airPressure,
+def scrapFromWUnderground(years, oceans, dates, hours, windPower, airPressure,
                           stormType, stormNames, latCorr, longCorr):
     """
     this function scrap from wunderground web, scrap every year and than the measurement of every storm.
@@ -145,7 +196,7 @@ def scrapFromWUnderground(years, oceans, dates, times, windPower, airPressure,
     :param years: list of years of storms
     :param oceans: list of oceans of storms
     :param dates: list of date of storms
-    :param times: list of time of every single measurement of storm
+    :param hours: list of time of every single measurement of storm
     :param windPower: list of wind power of every single measurement of storm
     :param airPressure: list of air pressure of every single measurement of storm
     :param stormType: list of storm type of storm
@@ -198,7 +249,7 @@ def scrapFromWUnderground(years, oceans, dates, times, windPower, airPressure,
             storms = soupYear.find_all('tr', class_='mat-row cdk-row ng-star-inserted')
             print(storms)
             for storm in storms:
-                getStormInformation(storm, ocean, year, years, oceans, dates, times, windPower, airPressure,
+                getStormInformation(storm, ocean, year, years, oceans, dates, hours, windPower, airPressure,
                                     stormType, stormNames, latCorr, longCorr)
-    print(pd.DataFrame({'storm_name': stormNames, 'year': years, 'date': dates, 'time': times, 'wind_power': windPower,
+    print(pd.DataFrame({'storm_name': stormNames, 'year': years, 'date': dates, 'time': hours, 'wind_power': windPower,
                         'air_pressure': airPressure, 'storm_type': stormType, 'lat': latCorr, 'long': longCorr}))
