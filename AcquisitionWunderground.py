@@ -1,5 +1,3 @@
-import time
-
 from AcquisitionHelper import *
 import itertools
 
@@ -158,9 +156,11 @@ def scrapDataFromCurrYear(year, ocean, years, oceans, dates, hours, windPower, a
 
 def scrapData():
     for ocean, url in oceansURL.items():
+        print(ocean)
         for i in range(2021, 1851, -1):
             scrapDataFromCurrYear(i, ocean, yearOfStorm, oceans, dates, hours, windPower, airPressure,
                                   stormType, stormsName, latCorr, longCorr, url)
+            print(i)
 start = time.time()
 yearOfStorm = []
 oceans = []
