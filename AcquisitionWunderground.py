@@ -85,7 +85,7 @@ def scrapDataFromCurrYear(year, ocean, years, oceans, dates, hours, windPower, a
     time.sleep(5)
     storm = driver.find_element(By.XPATH, '//*[@id="inner-content"]/div[2]/div/div/div[2]/div/div[3]'
                                           '/lib-storms-list/div/div/div[2]/div/div/table/tbody/tr[1]/td[1]/a')
-    if storm.text != 'NOT_NAMED':
+    if storm.text != 'NOT_NAMED' and storm.text != ' NOT_NAMED ':
         storm.click()
         driver.get(driver.current_url)
         c = driver.page_source
@@ -97,11 +97,14 @@ def scrapDataFromCurrYear(year, ocean, years, oceans, dates, hours, windPower, a
                 soup = bs4.BeautifulSoup(c, "html.parser")
                 getStormRecords(soup, year, ocean, years, oceans, dates, hours, windPower, airPressure,
                                 stormType, stormNames, latCorr, longCorr)
-                nextStorm = driver.find_element(By.XPATH, '//*[@id="inner-content"]/div[2]/div/div/div[2]/div/div['
-                                                          '2]/lib-storm/div/div/div[1]/ul/li[3]/a')
-                if nextStorm.text != 'All Storms »':
-                    nextStorm.click()
-                else:
+                try:
+                    nextStorm = driver.find_element(By.XPATH, '//*[@id="inner-content"]/div[2]/div/div/div[2]/div/div['
+                                                              '2]/lib-storm/div/div/div[1]/ul/li[3]/a')
+                    if nextStorm.text != 'All Storms »':
+                        nextStorm.click()
+                    else:
+                        break
+                except:
                     break
         else:
             driver.get(url)
@@ -119,7 +122,7 @@ def scrapDataFromCurrYear(year, ocean, years, oceans, dates, hours, windPower, a
                 xpath = xpath_soup(stormsLink[i])
                 nextStorm = stormsLink[i]
                 print(nextStorm.text)
-                if (nextStorm.text == ' NOT_NAMED '):
+                if nextStorm.text == ' NOT_NAMED ' or nextStorm.text == 'NOT_NAMED':
                     getInfoOfRow(rows[i], year, ocean, years, oceans, dates, hours, windPower, airPressure,
                                  stormType, stormNames, latCorr, longCorr)
                     continue
