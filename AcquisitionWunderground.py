@@ -1,5 +1,5 @@
 import time
-
+import numpy as np
 import bs4
 import pandas as pd
 from selenium import webdriver
@@ -22,7 +22,10 @@ def getStormRecords(soup, year, ocean, years, oceans, dates, hours, windPower, a
     time.sleep(2)
     stormName = driver.find_element(By.CLASS_NAME, 'sub-header').text
     stormName = stormName.split(' ')[1]
-    rows = soup.find('tbody').find_all('tr')
+    try:
+        rows = soup.find('tbody').find_all('tr')
+    except:
+        rows = []
     for row in rows:
         columns = row.find_all('td')
         years.append(year)
@@ -44,21 +47,42 @@ def scrapDataFromCurrYear(year, ocean, years, oceans, dates, hours, windPower, a
     time.sleep(5)
     storm = driver.find_element(By.XPATH, '//*[@id="inner-content"]/div[2]/div/div/div[2]/div/div[3]'
                                           '/lib-storms-list/div/div/div[2]/div/div/table/tbody/tr[1]/td[1]/a')
-    print(storm.text)
-    storm.click()
-    while True:
+    if storm.text != 'NOT_NAMED':
+        storm.click()
+        while True:
+            driver.get(driver.current_url)
+            c = driver.page_source
+            soup = bs4.BeautifulSoup(c, "html.parser")
+            getStormRecords(soup, year, ocean, years, oceans, dates, hours, windPower, airPressure,
+                            stormType, stormNames, latCorr, longCorr)
+            nextStorm = driver.find_element(By.XPATH, '//*[@id="inner-content"]/div[2]/div/div/div[2]/div/div['
+                                                      '2]/lib-storm/div/div/div[1]/ul/li[3]/a')
+
+            if nextStorm.text != 'All Storms »':
+                nextStorm.click()
+            else:
+                break
+    else:
         driver.get(driver.current_url)
         c = driver.page_source
         soup = bs4.BeautifulSoup(c, "html.parser")
-        getStormRecords(soup, year, ocean, years, oceans, dates, hours, windPower, airPressure,
-                        stormType, stormNames, latCorr, longCorr)
-        nextStorm = driver.find_element(By.XPATH, '//*[@id="inner-content"]/div[2]/div/div/div[2]/div/div['
-                                                  '2]/lib-storm/div/div/div[1]/ul/li[3]/a')
-
-        if nextStorm.text != 'All Storms »':
-            nextStorm.click()
-        else:
-            break
+        try:
+            rows = soup.find('tbody').find_all('tr')
+        except:
+            rows = []
+        for row in rows:
+            columns = row.find_all('td')
+            startDate = str(columns[1].text).split(' - ')[1] + '/' + str(year)
+            years.append(year)
+            oceans.append(ocean)
+            stormNames.append(columns[0].text)
+            dates.append(startDate)
+            hours.append('12:00:00 PM')
+            latCorr.append(np.nan)
+            longCorr.append(np.nan)
+            windPower.append(columns[2].text)
+            airPressure.append(columns[3].text)
+            stormType.append(columns[4].text)
     print(pd.DataFrame({'storm_name': stormNames, 'oceans': ocean, 'year': years, 'date': dates, 'time': hours,
                         'wind_power': windPower,
                         'air_pressure': airPressure, 'storm_type': stormType, 'lat': latCorr, 'long': longCorr}))
@@ -79,7 +103,8 @@ damagedUsd = []
 website = 'https://www.wunderground.com/hurricane/archive/AL'
 s = Service("C:/Program Files/chromeDriver/chromedriver.exe")
 driver = webdriver.Chrome(service=s)
-scrapDataFromCurrYear(2018, 'Atlantic Ocean', yearOfStorm, oceans, dates, hours, windPower, airPressure,
-                      stormType, stormsName, latCorr, longCorr)
+for i in range(2005, 2021):
+    scrapDataFromCurrYear(i, 'Atlantic Ocean', yearOfStorm, oceans, dates, hours, windPower, airPressure,
+                          stormType, stormsName, latCorr, longCorr)
 
 driver.quit()
