@@ -10,16 +10,21 @@ from selenium.webdriver.common.by import By
 
 LAST_YEAR = 2021
 FIRST_YEAR = 1950
-oceansURL = {
-    'Atlantic Ocean': "https://www.wunderground.com/hurricane/archive/AL",
-    'East Pacific': "https://www.wunderground.com/hurricane/archive/EP",
+oceansURL = {"""
+    'Atlantic Ocean': "https://www.wunderground.com/hurricane/archive/AL " """
+
+    'East Pacific': "https://www.wunderground.com/hurricane/archive/EP"}
+"""
     'Western Pacific': "https://www.wunderground.com/hurricane/archive/WP",
     'Indian Ocean': "https://www.wunderground.com/hurricane/archive/IO",
     'Central Pacific': "https://www.wunderground.com/hurricane/archive/CP",
     'Southern Hemisphere': "https://www.wunderground.com/hurricane/archive/SH"
 }
+"""
+CHROME1='C:/Users/sapir/Documents/Storms/chromedriver.exe'
+CHROME2= "C:/Program Files/chromeDriver/chromedriver.exe"
 website = 'https://www.wunderground.com/hurricane/archive/AL'
-s = Service('C:/Users/sapir/Documents/Storms/chromedriver.exe')
+s = Service(CHROME1)
 driver = webdriver.Chrome(service=s)
 
 

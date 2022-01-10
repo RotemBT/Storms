@@ -184,13 +184,13 @@ windPower = []
 airPressure = []
 deaths = []
 damagedUsd = []
-s = Service('C:/Users/sapir/Documents/Storms/chromedriver.exe')
+s = Service(CHROME1)
 driver = webdriver.Chrome(service=s)
 
 scrapData()
-df = pd.DataFrame({'storm_name': stormsName, 'oceans': oceans, 'year': yearOfStorm, 'date': dates, 'time': hours,
+df = pd.DataFrame({'storm_name': stormsName, 'year': yearOfStorm, 'date': dates, 'time': hours,
                    'wind_power': windPower,
                    'air_pressure': airPressure, 'storm_type': stormType, 'lat': latCorr, 'long': longCorr})
-df.to_csv('storms.csv')
+df.to_csv('east_pacific.csv')
 driver.quit()
 print(f'The time to scrap from Wunderground is : {time.time() - start}')
