@@ -9,7 +9,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 
 LAST_YEAR = 2021
-FIRST_YEAR = 1851
+FIRST_YEAR = 1950
 oceansURL = {
     'Atlantic Ocean': "https://www.wunderground.com/hurricane/archive/AL",
     'East Pacific': "https://www.wunderground.com/hurricane/archive/EP",
@@ -19,7 +19,7 @@ oceansURL = {
     'Southern Hemisphere': "https://www.wunderground.com/hurricane/archive/SH"
 }
 website = 'https://www.wunderground.com/hurricane/archive/AL'
-s = Service("C:/Program Files/chromeDriver/chromedriver.exe")
+s = Service('C:/Users/sapir/Documents/Storms/chromedriver.exe')
 driver = webdriver.Chrome(service=s)
 
 
@@ -76,7 +76,7 @@ def scrapGeneralInformationOfOcean(oceansURL):
     damagedUSD = []
     oceans = []
     for ocean, url in oceansURL.items():
-        s = Service("C:/Program Files/chromeDriver/chromedriver.exe")
+        s = Service('C:/Users/sapir/Documents/Storms/chromedriver.exe')
         driver = webdriver.Chrome(service=s)
         driver.get(url)
         c = driver.page_source
@@ -174,3 +174,23 @@ def scrapDataFromCurrYear(year, ocean, years, oceans, dates, hours, windPower, a
             windPower.append(columns[2].text)
             airPressure.append(columns[3].text)
             stormType.append(columns[4].text)
+# Handling with missing data
+"""
+def emptyLon(lonCorr):
+    sum1 = sum(lonCorr)
+    return float(sum1 / len(lonCorr))
+def emptyLat(latCorr):
+    sum2 = sum(latCorr)
+    return float(sum2 / len(latCorr))
+def emptyMinPressure(airPressure):
+    return min(airPressure)
+"""
+def fillMissingData(df):
+    mean = df['airPressure'].mean()
+    df['airPressure'].fillna(mean)
+
+    mean = df['lonCorr'].mean()
+    df['lonCorr'].fillna(mean)
+
+    mean = df['latCorr'].mean()
+    df['latCorr'].fillna(mean)

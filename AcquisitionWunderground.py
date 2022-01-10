@@ -80,90 +80,97 @@ def getGeneralRecord(year, ocean, years, oceans, dates, hours, windPower, airPre
 
 def scrapDataFromCurrYear(year, ocean, years, oceans, dates, hours, windPower, airPressure,
                           stormType, stormNames, latCorr, longCorr, url):
-    url = url + '/' + str(year)
-    driver.get(url)
-    time.sleep(5)
-    storm = driver.find_element(By.XPATH, '//*[@id="inner-content"]/div[2]/div/div/div[2]/div/div[3]'
-                                          '/lib-storms-list/div/div/div[2]/div/div/table/tbody/tr[1]/td[1]/a')
-    if storm.text != 'NOT_NAMED' and storm.text != ' NOT_NAMED ':
-        storm.click()
-        driver.get(driver.current_url)
-        c = driver.page_source
-        soup = bs4.BeautifulSoup(c, "html.parser")
-        if soup.find('table') is not None:
-            while True:
-                driver.get(driver.current_url)
-                c = driver.page_source
-                soup = bs4.BeautifulSoup(c, "html.parser")
-                getStormRecords(soup, year, ocean, years, oceans, dates, hours, windPower, airPressure,
-                                stormType, stormNames, latCorr, longCorr)
-                try:
-                    nextStorm = driver.find_element(By.XPATH, '//*[@id="inner-content"]/div[2]/div/div/div[2]/div/div['
-                                                              '2]/lib-storm/div/div/div[1]/ul/li[3]/a')
-                    if nextStorm.text != 'All Storms »':
-                        nextStorm.click()
-                    else:
-                        break
-                except:
-                    break
-        else:
-            driver.get(url)
+    try:
+        url = url + '/' + str(year)
+        driver.get(url)
+        time.sleep(4)
+        storm = driver.find_element(By.XPATH, '//*[@id="inner-content"]/div[2]/div/div/div[2]/div/div[3]'
+                                              '/lib-storms-list/div/div/div[2]/div/div/table/tbody/tr[1]/td[1]/a')
+
+        if storm.text != 'NOT_NAMED' and storm.text != ' NOT_NAMED ':
+            storm.click()
+            driver.get(driver.current_url)
             c = driver.page_source
             soup = bs4.BeautifulSoup(c, "html.parser")
-            rows = soup.find('tbody').find_all('tr')
-            getInfoOfRow(rows[0], year, ocean, years, oceans, dates, hours, windPower, airPressure,
-                         stormType, stormNames, latCorr, longCorr)
-            tdOfStorm = soup.find_all('td', {
-                'class': 'mat-cell cdk-cell cdk-column-summaryStormName mat-column-summaryStormName ng-star-inserted'})
-            stormsLink = [s.find('a') for s in tdOfStorm]
-            for i in range(1, len(stormsLink)):
-                driver.get(url)
-                time.sleep(3)
-                xpath = xpath_soup(stormsLink[i])
-                nextStorm = stormsLink[i]
-                print(nextStorm.text)
-                if nextStorm.text == ' NOT_NAMED ' or nextStorm.text == 'NOT_NAMED':
-                    getInfoOfRow(rows[i], year, ocean, years, oceans, dates, hours, windPower, airPressure,
-                                 stormType, stormNames, latCorr, longCorr)
-                    continue
-                # moving to next page by clicking on link text (with selenium)
-                element = driver.find_element(By.XPATH, xpath)
-                element.click()
-                driver.get(driver.current_url)
-                c = driver.page_source
-                soup = bs4.BeautifulSoup(c, "html.parser")
-                haveTable = soup.find('table')
-                if haveTable is not None:
-                    getStormRecords(soup, year, ocean, years, oceans, dates, hours, windPower, airPressure,
-                                    stormType, stormNames, latCorr, longCorr)
-                else:
-                    driver.get(url)
-                    time.sleep(3)
+            if soup.find('table') is not None:
+                while True:
+                    driver.get(driver.current_url)
                     c = driver.page_source
                     soup = bs4.BeautifulSoup(c, "html.parser")
-                    rows = soup.find('tbody').find_all('tr')
-                    getInfoOfRow(rows[i], year, ocean, years, oceans, dates, hours, windPower, airPressure,
-                                 stormType, stormNames, latCorr, longCorr)
-    else:
-        driver.get(driver.current_url)
-        c = driver.page_source
-        soup = bs4.BeautifulSoup(c, "html.parser")
-        try:
-            rows = soup.find('tbody').find_all('tr')
-        except:
-            rows = []
-        for row in rows:
-            getInfoOfRow(row, year, ocean, years, oceans, dates, hours, windPower, airPressure,
-                         stormType, stormNames, latCorr, longCorr)
+                    getStormRecords(soup, year, ocean, years, oceans, dates, hours, windPower, airPressure,
+                                    stormType, stormNames, latCorr, longCorr)
+                    try:
+                        nextStorm = driver.find_element(By.XPATH,
+                                                        '//*[@id="inner-content"]/div[2]/div/div/div[2]/div/div['
+                                                        '2]/lib-storm/div/div/div[1]/ul/li[3]/a')
+                        if nextStorm.text != 'All Storms »':
+                            nextStorm.click()
+                        else:
+                            break
+                    except:
+                        break
+            else:
+                driver.get(url)
+                c = driver.page_source
+                soup = bs4.BeautifulSoup(c, "html.parser")
+                rows = soup.find('tbody').find_all('tr')
+                getInfoOfRow(rows[0], year, ocean, years, oceans, dates, hours, windPower, airPressure,
+                             stormType, stormNames, latCorr, longCorr)
+                tdOfStorm = soup.find_all('td', {
+                    'class': 'mat-cell cdk-cell cdk-column-summaryStormName mat-column-summaryStormName ng-star-inserted'})
+                stormsLink = [s.find('a') for s in tdOfStorm]
+                for i in range(1, len(stormsLink)):
+                    driver.get(url)
+                    time.sleep(4)
+                    xpath = xpath_soup(stormsLink[i])
+                    nextStorm = stormsLink[i]
+                    print(nextStorm.text)
+                    if nextStorm.text == ' NOT_NAMED ' or nextStorm.text == 'NOT_NAMED':
+                        getInfoOfRow(rows[i], year, ocean, years, oceans, dates, hours, windPower, airPressure,
+                                     stormType, stormNames, latCorr, longCorr)
+                        continue
+                    # moving to next page by clicking on link text (with selenium)
+                    element = driver.find_element(By.XPATH, xpath)
+                    element.click()
+                    driver.get(driver.current_url)
+                    c = driver.page_source
+                    soup = bs4.BeautifulSoup(c, "html.parser")
+                    haveTable = soup.find('table')
+                    if haveTable is not None:
+                        getStormRecords(soup, year, ocean, years, oceans, dates, hours, windPower, airPressure,
+                                        stormType, stormNames, latCorr, longCorr)
+                    else:
+                        driver.get(url)
+                        time.sleep(5)
+                        c = driver.page_source
+                        soup = bs4.BeautifulSoup(c, "html.parser")
+                        rows = soup.find('tbody').find_all('tr')
+                        getInfoOfRow(rows[i], year, ocean, years, oceans, dates, hours, windPower, airPressure,
+                                     stormType, stormNames, latCorr, longCorr)
+        else:
+            driver.get(driver.current_url)
+            c = driver.page_source
+            soup = bs4.BeautifulSoup(c, "html.parser")
+            try:
+                rows = soup.find('tbody').find_all('tr')
+            except:
+                rows = []
+            for row in rows:
+                getInfoOfRow(row, year, ocean, years, oceans, dates, hours, windPower, airPressure,
+                             stormType, stormNames, latCorr, longCorr)
+    except:
+        print(driver.current_url)
 
 
 def scrapData():
     for ocean, url in oceansURL.items():
         print(ocean)
-        for i in range(2021, 1851, -1):
+        for i in range(2021, 1950, -1):
             scrapDataFromCurrYear(i, ocean, yearOfStorm, oceans, dates, hours, windPower, airPressure,
                                   stormType, stormsName, latCorr, longCorr, url)
             print(i)
+
+
 start = time.time()
 yearOfStorm = []
 oceans = []
@@ -177,7 +184,7 @@ windPower = []
 airPressure = []
 deaths = []
 damagedUsd = []
-s = Service("C:/Program Files/chromeDriver/chromedriver.exe")
+s = Service('C:/Users/sapir/Documents/Storms/chromedriver.exe')
 driver = webdriver.Chrome(service=s)
 
 scrapData()
