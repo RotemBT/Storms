@@ -1,9 +1,5 @@
 # Storms
 
-<<<<<<< HEAD
-
-=======
->>>>>>> master
 # Subtasks 
 Research Question <br>
 - [X] Write understading and clear research question
