@@ -164,11 +164,9 @@ def scrapDataFromCurrYear(year, ocean, years, oceans, dates, hours, windPower, a
 
 def scrapData():
     for ocean, url in oceansURL.items():
-        print(ocean)
-        for i in range(2021, 1950, -1):
+        for i in range(LAST_YEAR, FIRST_YEAR, -1):
             scrapDataFromCurrYear(i, ocean, yearOfStorm, oceans, dates, hours, windPower, airPressure,
                                   stormType, stormsName, latCorr, longCorr, url)
-            print(i)
 
 
 start = time.time()
@@ -184,13 +182,12 @@ windPower = []
 airPressure = []
 deaths = []
 damagedUsd = []
-s = Service(CHROME1)
+s = Service(ROTEM_LOCATION)
 driver = webdriver.Chrome(service=s)
 
 scrapData()
-df = pd.DataFrame({'storm_name': stormsName, 'year': yearOfStorm, 'date': dates, 'time': hours,
-                   'wind_power': windPower,
-                   'air_pressure': airPressure, 'storm_type': stormType, 'lat': latCorr, 'long': longCorr})
-df.to_csv('east_pacific.csv')
+df = getDataFrame(stormsName, yearOfStorm, oceans, dates, hours, windPower, airPressure,
+                  stormType, latCorr, longCorr)
+df.to_csv('Southern_Hemisphere.csv')
 driver.quit()
 print(f'The time to scrap from Wunderground is : {time.time() - start}')

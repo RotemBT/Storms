@@ -10,22 +10,27 @@ from selenium.webdriver.common.by import By
 
 LAST_YEAR = 2021
 FIRST_YEAR = 1950
-oceansURL = {"""
-    'Atlantic Ocean': "https://www.wunderground.com/hurricane/archive/AL " """
-
-    'East Pacific': "https://www.wunderground.com/hurricane/archive/EP"}
-"""
+oceansURL = {
+    'Atlantic Ocean': "https://www.wunderground.com/hurricane/archive/AL",
+    'East Pacific': "https://www.wunderground.com/hurricane/archive/EP",
     'Western Pacific': "https://www.wunderground.com/hurricane/archive/WP",
     'Indian Ocean': "https://www.wunderground.com/hurricane/archive/IO",
     'Central Pacific': "https://www.wunderground.com/hurricane/archive/CP",
     'Southern Hemisphere': "https://www.wunderground.com/hurricane/archive/SH"
 }
-"""
-CHROME1='C:/Users/sapir/Documents/Storms/chromedriver.exe'
-CHROME2= "C:/Program Files/chromeDriver/chromedriver.exe"
+
+SAPIR_LOCATION = 'C:/Users/sapir/Documents/Storms/chromedriver.exe'
+ROTEM_LOCATION = "C:/Program Files/chromeDriver/chromedriver.exe"
 website = 'https://www.wunderground.com/hurricane/archive/AL'
-s = Service(CHROME1)
+s = Service(ROTEM_LOCATION)
 driver = webdriver.Chrome(service=s)
+
+
+def getDataFrame(stormsName, yearOfStorm, oceans, dates, hours, windPower, airPressure, stormType, latCorr, longCorr):
+    return pd.DataFrame(
+        pd.DataFrame({'storm_name': stormsName, 'year': yearOfStorm, 'oceans': oceans, 'date': dates, 'time': hours,
+                      'wind_power': windPower,
+                      'air_pressure': airPressure, 'storm_type': stormType, 'lat': latCorr, 'long': longCorr}))
 
 
 # Return bs4 instance
@@ -179,6 +184,8 @@ def scrapDataFromCurrYear(year, ocean, years, oceans, dates, hours, windPower, a
             windPower.append(columns[2].text)
             airPressure.append(columns[3].text)
             stormType.append(columns[4].text)
+
+
 # Handling with missing data
 """
 def emptyLon(lonCorr):
@@ -190,6 +197,8 @@ def emptyLat(latCorr):
 def emptyMinPressure(airPressure):
     return min(airPressure)
 """
+
+
 def fillMissingData(df):
     mean = df['airPressure'].mean()
     df['airPressure'].fillna(mean)
