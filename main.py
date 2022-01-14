@@ -1,23 +1,13 @@
-import pandas as pd
-
 from AcquisitionHelper import *
 
-yearOfStorm = []
-oceans = []
-dates = []
-hours = []
-stormsName = []
-stormType = []
-latCorr = []
-longCorr = []
-windPower = []
-airPressure = []
-deaths = []
-damagedUsd = []
+"""start = time.time()
 
-scrapGeneralInformationOfOcean(oceansURL)
+scrapData()
+df = getDataFrame(stormsName, yearOfStorm, oceans, dates, hours, windPower, airPressure,
+                  stormType, latCorr, longCorr)
 
-for i in range(2021, 1851, -1):
-    scrapDataFromCurrYear(i, 'Atlantic Ocean', yearOfStorm, oceans, dates, hours, windPower, airPressure,
-                          stormType, stormsName, latCorr, longCorr)
+sendToCSV(df, 'demo.csv')
+driver.quit()
+print(f'The time to scrap from Wunderground is : {time.time() - start}')
 
+"""
