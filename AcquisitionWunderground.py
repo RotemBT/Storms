@@ -188,6 +188,6 @@ driver = webdriver.Chrome(service=s)
 scrapData()
 df = getDataFrame(stormsName, yearOfStorm, oceans, dates, hours, windPower, airPressure,
                   stormType, latCorr, longCorr)
-df.to_csv('Southern_Hemisphere.csv')
+df.to_csv('Southern_Hemisphere.csv', index=False)
 driver.quit()
 print(f'The time to scrap from Wunderground is : {time.time() - start}')
