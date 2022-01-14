@@ -1,9 +1,5 @@
 # Storms
 
-<<<<<<< HEAD
-
-=======
->>>>>>> master
 # Subtasks 
 Research Question <br>
 - [X] Write understading and clear research question
@@ -16,10 +12,6 @@ Learning <br>
 Crawling <br>
 - [X] Crawling from wunderground
 - [X] Crawling from wikipedia
-<<<<<<< HEAD
-=======
-
->>>>>>> master
 
 Data handling <br>
 - [ ] Handling Empty spaces
