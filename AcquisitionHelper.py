@@ -11,17 +11,17 @@ import itertools
 
 # required years
 LAST_YEAR = 2021
-FIRST_YEAR = 2020
+FIRST_YEAR = 1950
 # required oceans
 oceansURL = {
-    'Atlantic Ocean': "https://www.wunderground.com/hurricane/archive/AL"}
-""",
+    'Atlantic Ocean': "https://www.wunderground.com/hurricane/archive/AL",
     'East Pacific': "https://www.wunderground.com/hurricane/archive/EP",
     'Western Pacific': "https://www.wunderground.com/hurricane/archive/WP",
     'Indian Ocean': "https://www.wunderground.com/hurricane/archive/IO",
     'Central Pacific': "https://www.wunderground.com/hurricane/archive/CP",
     'Southern Hemisphere': "https://www.wunderground.com/hurricane/archive/SH"
-}"""
+}
+
 # required fields
 yearOfStorm = []
 oceans = []
@@ -38,9 +38,15 @@ damagedUsd = []
 
 SAPIR_LOCATION = 'C:/Users/sapir/Documents/Storms/chromedriver.exe'
 ROTEM_LOCATION = "C:/Program Files/chromeDriver/chromedriver.exe"
-website = 'https://www.wunderground.com/hurricane/archive/AL'
 s = Service(ROTEM_LOCATION)
 driver = webdriver.Chrome(service=s)
+
+
+# get bs4 obj of current URL using driver and bs4
+def getSoupObj(url):
+    driver.get(url)
+    c = driver.page_source
+    return bs4.BeautifulSoup(c, "html.parser")
 
 
 def sendToCSV(dataFrame, fileName):
@@ -53,10 +59,12 @@ def scrapData():
             scrapDataFromCurrYear(i, ocean, yearOfStorm, oceans, dates, hours, windPower, airPressure,
                                   stormType, stormsName, latCorr, longCorr, url)
 
+    driver.quit()
+
 
 def getDataFrame(stormsName, yearOfStorm, oceans, dates, hours, windPower, airPressure, stormType, latCorr, longCorr):
     return pd.DataFrame(
-        pd.DataFrame({'storm_name': stormsName, 'year': yearOfStorm, 'oceans': oceans, 'date': dates, 'time': hours,
+        pd.DataFrame({'storm_name': stormsName, 'year': yearOfStorm, 'Ocean': oceans, 'date': dates, 'time': hours,
                       'wind_power': windPower,
                       'air_pressure': airPressure, 'storm_type': stormType, 'lat': latCorr, 'long': longCorr}))
 
@@ -114,11 +122,7 @@ def scrapGeneralInformationOfOcean(oceansURL):
     damagedUSD = []
     oceans = []
     for ocean, url in oceansURL.items():
-        s = Service('C:/Users/sapir/Documents/Storms/chromedriver.exe')
-        driver = webdriver.Chrome(service=s)
-        driver.get(url)
-        c = driver.page_source
-        soup = bs4.BeautifulSoup(c, "html.parser")
+        soup = getSoupObj(url)
         tdOfYear = soup.find_all('td',
                                  class_='mat-cell cdk-cell cdk-column-year mat-column-year ng-star-inserted')
         tdOfStorm = soup.find_all('td',
@@ -208,9 +212,7 @@ def getInfoOfRow(row, year, ocean, years, oceans, dates, hours, windPower, airPr
 
 def getGeneralRecord(year, ocean, years, oceans, dates, hours, windPower, airPressure,
                      stormType, stormNames, latCorr, longCorr):
-    driver.get(driver.current_url)
-    c = driver.page_source
-    soup = bs4.BeautifulSoup(c, "html.parser")
+    soup = getSoupObj(driver.current_url)
     try:
         rows = soup.find('tbody').find_all('tr')
     except:
@@ -231,14 +233,10 @@ def scrapDataFromCurrYear(year, ocean, years, oceans, dates, hours, windPower, a
 
         if storm.text != 'NOT_NAMED' and storm.text != ' NOT_NAMED ':
             storm.click()
-            driver.get(driver.current_url)
-            c = driver.page_source
-            soup = bs4.BeautifulSoup(c, "html.parser")
+            soup = getSoupObj(driver.current_url)
             if soup.find('table') is not None:
                 while True:
-                    driver.get(driver.current_url)
-                    c = driver.page_source
-                    soup = bs4.BeautifulSoup(c, "html.parser")
+                    soup = getSoupObj(driver.current_url)
                     getStormRecords(soup, year, ocean, years, oceans, dates, hours, windPower, airPressure,
                                     stormType, stormNames, latCorr, longCorr)
                     try:
@@ -252,9 +250,7 @@ def scrapDataFromCurrYear(year, ocean, years, oceans, dates, hours, windPower, a
                     except:
                         break
             else:
-                driver.get(url)
-                c = driver.page_source
-                soup = bs4.BeautifulSoup(c, "html.parser")
+                soup = getSoupObj(url)
                 rows = soup.find('tbody').find_all('tr')
                 getInfoOfRow(rows[0], year, ocean, years, oceans, dates, hours, windPower, airPressure,
                              stormType, stormNames, latCorr, longCorr)
@@ -266,33 +262,27 @@ def scrapDataFromCurrYear(year, ocean, years, oceans, dates, hours, windPower, a
                     time.sleep(4)
                     xpath = xpath_soup(stormsLink[i])
                     nextStorm = stormsLink[i]
-                    print(nextStorm.text)
                     if nextStorm.text == ' NOT_NAMED ' or nextStorm.text == 'NOT_NAMED':
                         getInfoOfRow(rows[i], year, ocean, years, oceans, dates, hours, windPower, airPressure,
                                      stormType, stormNames, latCorr, longCorr)
                         continue
+
                     # moving to next page by clicking on link text (with selenium)
                     element = driver.find_element(By.XPATH, xpath)
                     element.click()
-                    driver.get(driver.current_url)
-                    c = driver.page_source
-                    soup = bs4.BeautifulSoup(c, "html.parser")
+                    soup = getSoupObj(driver.current_url)
                     haveTable = soup.find('table')
                     if haveTable is not None:
                         getStormRecords(soup, year, ocean, years, oceans, dates, hours, windPower, airPressure,
                                         stormType, stormNames, latCorr, longCorr)
                     else:
-                        driver.get(url)
+                        soup = getSoupObj(url)
                         time.sleep(5)
-                        c = driver.page_source
-                        soup = bs4.BeautifulSoup(c, "html.parser")
                         rows = soup.find('tbody').find_all('tr')
                         getInfoOfRow(rows[i], year, ocean, years, oceans, dates, hours, windPower, airPressure,
                                      stormType, stormNames, latCorr, longCorr)
         else:
-            driver.get(driver.current_url)
-            c = driver.page_source
-            soup = bs4.BeautifulSoup(c, "html.parser")
+            soup = getSoupObj(driver.current_url)
             try:
                 rows = soup.find('tbody').find_all('tr')
             except:
