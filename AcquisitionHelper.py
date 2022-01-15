@@ -35,10 +35,9 @@ windPower = []
 airPressure = []
 deaths = []
 damagedUsd = []
-
-SAPIR_LOCATION = 'C:/Users/sapir/Documents/Storms/chromedriver.exe'
-ROTEM_LOCATION = "C:/Program Files/chromeDriver/chromedriver.exe"
-s = Service(ROTEM_LOCATION)
+# Enter in chromeDriverPath your chrome driver path
+chromeDriverPath = ""
+s = Service(chromeDriverPath)
 driver = webdriver.Chrome(service=s)
 
 
