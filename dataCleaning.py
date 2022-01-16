@@ -17,7 +17,7 @@ print(df.duplicated().sum())
 print(removeDuplicatives(df))
 print(df.dropna(thresh=len(df.columns)-2))
 def squareEqution(a,b,c):
-    # https://sciencing.com/read-digital-barometer-4928057.html
+    # https://sciencing.com/convert-wind-speed-pressure-5814125.html
     try:
         d = (b**2) -(4*a*c)
         sol1 = (-b-math.sqrt(d))/(2*a)
