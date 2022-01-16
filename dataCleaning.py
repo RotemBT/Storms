@@ -18,6 +18,7 @@ print(removeDuplicatives(df))
 print(df.dropna(thresh=len(df.columns)-2))
 def squareEqution(a,b,c):
     # https://sciencing.com/convert-wind-speed-pressure-5814125.html
+    # convertor -https://www.metric-conversions.org/speed/miles-per-hour-to-meters-per-second.htm
     try:
         d = (b**2) -(4*a*c)
         sol1 = (-b-math.sqrt(d))/(2*a)
