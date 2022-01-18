@@ -12,12 +12,6 @@ def removeDuplicatives(df):
 df = pd.read_csv('stormsDate.csv')
 indexNames = df[(df['storm_type'] == 'Unknown')].index
 
-print(indexNames)
-print(df.iloc[indexNames])
-print(df.duplicated().sum())
-print(removeDuplicatives(df))
-print(df.dropna(thresh=len(df.columns) - 2))
-
 
 def windSpeedToPressure(windSpeedInMPH):
     windSpeedInMS = windSpeedInMPH * 0.44704
@@ -38,23 +32,17 @@ def pressureToWindSpeed(pressure):
     except:
         return None
 
+
 def manipulatePacific(df):
-    dataframe=df.copy()
-    for _,row in dataframe.iterrows():
+    dataframe = df.copy()
+    for ind, row in dataframe.iterrows():
         if math.isnan(row['air_pressure']) and row['wind_power'] > 0:
-            row['air_pressure'] = float(windSpeedToPressure(row['wind_power']))
-        elif row['air_pressure'] is not None and row['wind_power'] <= 0:
-            row['wind_power'] = pressureToWindSpeed(row['air_pressure'])
+            dataframe.loc[ind, 'air_pressure'] = float(windSpeedToPressure(row['wind_power']))
+        elif row['air_pressure'] is not None and row['wind_power'] <= 0.0:
+            dataframe.loc[ind, 'wind_power'] = pressureToWindSpeed(row['air_pressure'])
+    print(dataframe['wind_power'])
     return dataframe
 
 
-dframe = df[(df['wind_power'] == -1) & (df['storm_type'] == 'Unknown')]
-dframe1 = df[df['air_pressure'].isnull()]
-df[df['Ocean'].str.contains('Pacific')]= manipulatePacific(df[df['Ocean'].str.contains('Pacific')])
-print(df[df['Ocean'].str.contains('Pacific')])
-
-print(pressureToWindSpeed(985))
-print(windSpeedToPressure(52))
-print(dframe)
-print(dframe1)
-print(df[df['Ocean'].str.contains('Pacific')])
+df[df['Ocean'].str.contains('Pacific')] = manipulatePacific(df[df['Ocean'].str.contains('Pacific')])
+print(df[df['Ocean'].str.contains('Pacific')]['wind_power'])
