@@ -1,13 +1,7 @@
-import cmath
 import math
-
+import time
 import numpy as np
 import pandas as pd
-
-
-def removeDuplicatives(df):
-    return df.drop_duplicates().copy()
-
 
 # df = pd.read_csv('stormsDate.csv')
 
@@ -18,6 +12,7 @@ def windSpeedToPressure(windSpeedInMPH):
 
 
 def pressureToWindSpeed(pressure):
+    # Only in Pacific Ocean
     # https://sciencing.com/convert-wind-speed-pressure-5814125.html
     # convertor -https://www.metric-conversions.org/speed/miles-per-hour-to-meters-per-second.htm
     a = -0.00259
@@ -39,25 +34,34 @@ def manipulatePacific(df):
             dataframe.loc[ind, 'air_pressure'] = float(windSpeedToPressure(row['wind_power']))
         elif row['air_pressure'] is not None and row['wind_power'] <= 0.0:
             dataframe.loc[ind, 'wind_power'] = pressureToWindSpeed(row['air_pressure'])
-    print(dataframe['wind_power'])
     return dataframe
 
 
-"""
-df[df['Ocean'].str.contains('Pacific')] = manipulatePacific(df[df['Ocean'].str.contains('Pacific')])
-# print(df[df['Ocean'].str.contains('Pacific')]['wind_power'])
-inds = df[((df['wind_power'] == '') | (df['wind_power'] <= 0.0)) & (
-            (df['air_pressure'] == '') | df['air_pressure'] == 0.0) & (
-                  df['storm_type'] == 'Unknown')].index
-df.drop(inds, inplace=True)
+def fillMissingWindOrPressure(df, columnName, compareTo):
+    missingValues = df[np.logical_or(df[columnName] == 0.0, df[columnName].isnull())].index
+    for ind in missingValues:
+        row = df.loc[ind].copy()
+        columnValues = df[np.logical_and(row['Ocean'] == df['Ocean'],
+                                         row[compareTo] == df[compareTo])][columnName]
+        df.loc[ind, columnName] = columnValues[columnValues != 0].median()
+
+
+start = time.time()
+df = pd.read_csv('rotem1.csv')
+# remove storms with unknown type.
+df.drop(df[df['storm_type'] == 'Unknown'].index, inplace=True)
+# remove storms without lan and long coordinate.
 df.dropna(subset=['lat', 'long'], axis=0, inplace=True)
-df.drop(df[df['storm_type']=='Unknown'].index,inplace=True)
-"""
-df = pd.read_csv('demos.csv')
-missingWind = df[np.logical_or(df['wind_power'] == 0.0, df['wind_power'] == '')].index
-for ind in missingWind:
-    row = df.iloc[ind]
-    row['wind_power'] = np.mean(
-        df[np.logical_and(row['Ocean'] == df['Ocean'], row['air_pressure'] == df['air_pressure'])]['wind_power'])
-print(missingWind)
+# fill wind_power column
+fillMissingWindOrPressure(df, 'air_pressure', 'wind_power')
+# fill air_pressure column
+fillMissingWindOrPressure(df, 'wind_power', 'air_pressure')
+# remove storms with wrong wind_power calculation.
+df.drop(df[df['wind_power'] <= 0].index, inplace=True)
+# remove last missing values
+df.dropna(axis=0, inplace=True)
+# drop duplicates
+df.drop_duplicates()
 print(df)
+df.to_csv('rotem1.csv', index=False)
+print('The time is {}'.format(time.time() - start))
