@@ -14,9 +14,9 @@ Crawling <br>
 - [X] Crawling from wikipedia
 
 Data handling <br>
-- [ ] Handling Empty spaces
-- [ ] Handling Duplicates
-- [ ] Handling Outliers
+- [X] Handling Empty spaces
+- [X] Handling Duplicates
+- [X] Handling Outliers
 
 EDA  <br>
 - [ ] Find the best graph to visualize our data
