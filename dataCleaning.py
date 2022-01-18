@@ -44,5 +44,9 @@ def manipulatePacific(df):
     return dataframe
 
 
-df[df['Ocean'].str.contains('Pacific')] = manipulatePacific(df[df['Ocean'].str.contains('Pacific')])
-print(df[df['Ocean'].str.contains('Pacific')]['wind_power'])
+# df[df['Ocean'].str.contains('Pacific')] = manipulatePacific(df[df['Ocean'].str.contains('Pacific')])
+# print(df[df['Ocean'].str.contains('Pacific')]['wind_power'])
+inds = df[(df['wind_power'] <= 0.0) & ((df['air_pressure'] == '') | df['air_pressure']==0.0) & (df['storm_type'] == 'Unknown')].index
+df.drop(inds,inplace=True)
+print(inds)
+print(df)
