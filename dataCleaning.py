@@ -46,7 +46,10 @@ def manipulatePacific(df):
 
 # df[df['Ocean'].str.contains('Pacific')] = manipulatePacific(df[df['Ocean'].str.contains('Pacific')])
 # print(df[df['Ocean'].str.contains('Pacific')]['wind_power'])
-inds = df[(df['wind_power'] <= 0.0) & ((df['air_pressure'] == '') | df['air_pressure']==0.0) & (df['storm_type'] == 'Unknown')].index
-df.drop(inds,inplace=True)
+inds = df[((df['wind_power'] == '') | (df['wind_power'] <= 0.0)) & (
+            (df['air_pressure'] == '') | df['air_pressure'] == 0.0) & (
+                  df['storm_type'] == 'Unknown')].index
+df.drop(inds, inplace=True)
+df.dropna(subset=['lat', 'long'], axis=0, inplace=True)
 print(inds)
 print(df)
