@@ -38,20 +38,23 @@ def pressureToWindSpeed(pressure):
     except:
         return None
 
-
 def manipulatePacific(df):
     dataframe=df.copy()
-    for row in df:
-        if row['air_pressure'].isnull() and row['wind_power'] > 0:
-            row['air_pressure'] = windSpeedToPressure(row['wind_power'])
-        elif row['air_pressure'].notnull() and row['wind_power'] <= 0:
+    for _,row in dataframe.iterrows():
+        if math.isnan(row['air_pressure']) and row['wind_power'] > 0:
+            row['air_pressure'] = float(windSpeedToPressure(row['wind_power']))
+        elif row['air_pressure'] is not None and row['wind_power'] <= 0:
             row['wind_power'] = pressureToWindSpeed(row['air_pressure'])
     return dataframe
 
 
 dframe = df[(df['wind_power'] == -1) & (df['storm_type'] == 'Unknown')]
 dframe1 = df[df['air_pressure'].isnull()]
+df[df['Ocean'].str.contains('Pacific')]= manipulatePacific(df[df['Ocean'].str.contains('Pacific')])
+print(df[df['Ocean'].str.contains('Pacific')])
+
 print(pressureToWindSpeed(985))
 print(windSpeedToPressure(52))
 print(dframe)
 print(dframe1)
+print(df[df['Ocean'].str.contains('Pacific')])
