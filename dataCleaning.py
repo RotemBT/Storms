@@ -40,11 +40,13 @@ def pressureToWindSpeed(pressure):
 
 
 def manipulatePacific(df):
+    dataframe=df.copy()
     for row in df:
         if row['air_pressure'].isnull() and row['wind_power'] > 0:
             row['air_pressure'] = windSpeedToPressure(row['wind_power'])
         elif row['air_pressure'].notnull() and row['wind_power'] <= 0:
             row['wind_power'] = pressureToWindSpeed(row['air_pressure'])
+    return dataframe
 
 
 dframe = df[(df['wind_power'] == -1) & (df['storm_type'] == 'Unknown')]
