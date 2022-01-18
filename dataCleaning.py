@@ -1,6 +1,7 @@
 import cmath
 import math
 
+import numpy as np
 import pandas as pd
 
 
@@ -26,9 +27,9 @@ def windSpeedToPressure(windSpeedInMPH):
 def pressureToWindSpeed(pressure):
     # https://sciencing.com/convert-wind-speed-pressure-5814125.html
     # convertor -https://www.metric-conversions.org/speed/miles-per-hour-to-meters-per-second.htm
-    a=-0.00259
-    b=-0.361451
-    c=1014.9-pressure
+    a = -0.00259
+    b = -0.361451
+    c = 1014.9 - pressure
     try:
         d = (b ** 2) - (4 * a * c)
         sol1 = (-b - math.sqrt(d)) / (2 * a)
@@ -38,5 +39,17 @@ def pressureToWindSpeed(pressure):
         return None
 
 
+def manipulatePacific(df):
+    for row in df:
+        if row['air_pressure'].isnull() and row['wind_power'] > 0:
+            row['air_pressure'] = windSpeedToPressure(row['wind_power'])
+        elif row['air_pressure'].notnull() and row['wind_power'] <= 0:
+            row['wind_power'] = pressureToWindSpeed(row['air_pressure'])
+
+
+dframe = df[(df['wind_power'] == -1) & (df['storm_type'] == 'Unknown')]
+dframe1 = df[df['air_pressure'].isnull()]
 print(pressureToWindSpeed(985))
 print(windSpeedToPressure(52))
+print(dframe)
+print(dframe1)
