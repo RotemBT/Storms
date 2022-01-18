@@ -9,8 +9,7 @@ def removeDuplicatives(df):
     return df.drop_duplicates().copy()
 
 
-df = pd.read_csv('stormsDate.csv')
-indexNames = df[(df['storm_type'] == 'Unknown')].index
+# df = pd.read_csv('stormsDate.csv')
 
 
 def windSpeedToPressure(windSpeedInMPH):
@@ -44,12 +43,21 @@ def manipulatePacific(df):
     return dataframe
 
 
-# df[df['Ocean'].str.contains('Pacific')] = manipulatePacific(df[df['Ocean'].str.contains('Pacific')])
+"""
+df[df['Ocean'].str.contains('Pacific')] = manipulatePacific(df[df['Ocean'].str.contains('Pacific')])
 # print(df[df['Ocean'].str.contains('Pacific')]['wind_power'])
 inds = df[((df['wind_power'] == '') | (df['wind_power'] <= 0.0)) & (
             (df['air_pressure'] == '') | df['air_pressure'] == 0.0) & (
                   df['storm_type'] == 'Unknown')].index
 df.drop(inds, inplace=True)
 df.dropna(subset=['lat', 'long'], axis=0, inplace=True)
-print(inds)
+df.drop(df[df['storm_type']=='Unknown'].index,inplace=True)
+"""
+df = pd.read_csv('demos.csv')
+missingWind = df[np.logical_or(df['wind_power'] == 0.0, df['wind_power'] == '')].index
+for ind in missingWind:
+    row = df.iloc[ind]
+    row['wind_power'] = np.mean(
+        df[np.logical_and(row['Ocean'] == df['Ocean'], row['air_pressure'] == df['air_pressure'])]['wind_power'])
+print(missingWind)
 print(df)
