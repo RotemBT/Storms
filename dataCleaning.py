@@ -3,7 +3,7 @@ import time
 import numpy as np
 import pandas as pd
 
-# df = pd.read_csv('stormsDate.csv')
+df = pd.read_csv('stormsDate.csv')
 
 
 def windSpeedToPressure(windSpeedInMPH):
@@ -47,9 +47,9 @@ def fillMissingWindOrPressure(df, columnName, compareTo):
 
 
 start = time.time()
-df = pd.read_csv('rotem1.csv')
+#df = pd.read_csv('rotem1.csv')
 # remove storms with unknown type.
-df.drop(df[df['storm_type'] == 'Unknown'].index, inplace=True)
+#df.drop(df[df['storm_type'] == 'Unknown'].index, inplace=True)
 # remove storms without lan and long coordinate.
 df.dropna(subset=['lat', 'long'], axis=0, inplace=True)
 # fill wind_power column
@@ -64,4 +64,5 @@ df.dropna(axis=0, inplace=True)
 df.drop_duplicates()
 print(df)
 df.to_csv('rotem1.csv', index=False)
+# take 14 min
 print('The time is {}'.format(time.time() - start))
