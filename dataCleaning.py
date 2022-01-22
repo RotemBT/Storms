@@ -52,9 +52,9 @@ start = time.time()
 #df.drop(df[df['storm_type'] == 'Unknown'].index, inplace=True)
 # remove storms without lan and long coordinate.
 df.dropna(subset=['lat', 'long'], axis=0, inplace=True)
-# fill wind_power column
-fillMissingWindOrPressure(df, 'air_pressure', 'wind_power')
 # fill air_pressure column
+fillMissingWindOrPressure(df, 'air_pressure', 'wind_power')
+# fill wind_power column
 fillMissingWindOrPressure(df, 'wind_power', 'air_pressure')
 # remove storms with wrong wind_power calculation.
 df.drop(df[df['wind_power'] <= 0].index, inplace=True)
@@ -65,4 +65,5 @@ df.drop_duplicates()
 print(df)
 df.to_csv('rotem1.csv', index=False)
 # take 14 min
+# without wind filling take less than 10 min
 print('The time is {}'.format(time.time() - start))

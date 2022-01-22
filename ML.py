@@ -1,28 +1,59 @@
 import datetime
 
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
-import sklearn
 from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import MinMaxScaler, StandardScaler, normalize
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import r2_score, f1_score
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import StandardScaler
 
-df = pd.read_csv('addingBeaufort.csv')
+df = pd.DataFrame(pd.read_csv('addingBeaufort.csv'))
+"""
 bins = [0, 1, 3, 7, 12, 18, 24, 31, 38, 46, 54, 63, 72, 250]
 labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 # https://en.wikipedia.org/wiki/Beaufort_scale
 df['beaufort_scale'] = pd.cut(df['wind_power'], bins, labels=labels)
 df['Ocean'] = df['Ocean'].astype('category')
 df['ocean_code'] = df['Ocean'].cat.codes
-
 df['curr_date'] = df.apply(
     lambda row: datetime.datetime.strptime(f"{int(row.year)}-{int(row.Month)}-{int(row.Day)}", '%Y-%m-%d'), axis=1)
 df["curr_date"] = df["curr_date"].dt.strftime('%Y%m%d').astype(float)
-print(df['curr_date'])
-"""X = df[df.columns[
-    (df.columns == 'curr_date') & (df.columns == 'lat') & (df.columns == 'long') & (df.columns == 'air_pressure') & (
-            df.columns == 'beaufort_scale')]]"""
-X = df.loc[:, ~df.columns.isin(['storm_name', 'year', 'time', 'wind_power', 'storm_type', 'Ocean', 'Month', 'Day'])]
+df.drop('Unnamed: 0', 1,inplace=True)
+df.to_csv('addingBeaufort.csv', index=False)"""
+# print(df['curr_date'])
+scaler = MinMaxScaler(feature_range=(-1, 1))
+std = StandardScaler()
+X = df.loc[:, ~df.columns.isin(
+    ['ocean_code', 'storm_name', 'year', 'time', 'wind_power', 'storm_type', 'Ocean', 'Day', 'air_pressure', 'Month',
+     'beaufort_scale'])]
+print(df.describe())
+print(X.columns)
 y = df['wind_power']
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
-model = LinearRegression().fit(X_train, y_train)
+X= scaler.fit_transform(X)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0, shuffle=False)
 
+model = LinearRegression().fit(X_train, y_train)
+print(model.score(X_test, y_test))
+predicted = model.predict(X_test)
+predicted = np.round(predicted)
+print(predicted)
+print(r2_score(y_test, predicted))
+
+lat = float(input("Please enter Lat value: "))
+long = float(input("Please enter Long value: "))
+date_entry = float(input('Enter a date in Month format'))
+"""year, month, day = map(int, date_entry.split('-'))
+date = float(datetime.date(year, month, day).strftime('%Y%m%d'))"""
+
+while (-90 <= lat <= 90 and -180 <= long <= 180):
+    userInput = [lat, long, date_entry]
+    # userInput=scaler.fit_transform(userInput)
+    print(
+        'Prediction of wind power is : {:.1f} mph'.format(round(float(model.predict([[lat, long, date_entry]])[0]))))
+    lat = float(input("Please enter Lat value: "))
+    long = float(input("Please enter Long value: "))
+    date_entry = float(input('Enter a date in Month format'))
+
+print('Input is out of range!')
