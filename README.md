@@ -19,8 +19,8 @@ Data handling <br>
 - [X] Handling Outliers
 
 EDA  <br>
-- [ ] Find the best graph to visualize our data
-- [ ] Visualize our data using graphs
+- [X] Find the best graph to visualize our data
+- [X] Visualize our data using graphs
 
 Machine Learning Model  <br>
 - [ ] Analyse our data and params
