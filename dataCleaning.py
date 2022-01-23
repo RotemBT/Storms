@@ -47,9 +47,7 @@ def fillMissingWindOrPressure(df, columnName, compareTo):
 
 
 start = time.time()
-#df = pd.read_csv('rotem1.csv')
-# remove storms with unknown type.
-#df.drop(df[df['storm_type'] == 'Unknown'].index, inplace=True)
+
 # remove storms without lan and long coordinate.
 df.dropna(subset=['lat', 'long'], axis=0, inplace=True)
 # fill air_pressure column
@@ -65,5 +63,4 @@ df.drop_duplicates()
 print(df)
 df.to_csv('rotem1.csv', index=False)
 # take 14 min
-# without wind filling take less than 10 min
-print('The time is {}'.format(time.time() - start))
+print(f'The time is {time.time() - start}')
