@@ -292,26 +292,3 @@ def scrapDataFromCurrYear(year, ocean, years, oceans, dates, hours, windPower, a
     except:
         print(driver.current_url)
 
-
-# Handling with missing data
-"""
-def emptyLon(lonCorr):
-    sum1 = sum(lonCorr)
-    return float(sum1 / len(lonCorr))
-def emptyLat(latCorr):
-    sum2 = sum(latCorr)
-    return float(sum2 / len(latCorr))
-def emptyMinPressure(airPressure):
-    return min(airPressure)
-"""
-
-
-def fillMissingData(df):
-    mean = df['airPressure'].mean()
-    df['airPressure'].fillna(mean)
-
-    mean = df['lonCorr'].mean()
-    df['lonCorr'].fillna(mean)
-
-    mean = df['latCorr'].mean()
-    df['latCorr'].fillna(mean)

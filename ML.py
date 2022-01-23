@@ -49,9 +49,7 @@ def linearRegressionModel(df):
     model = LinearRegression().fit(X_train, y_train)
     y_pred = model.predict(X_test)
     lat, long, pressure, year, month, day = getParams()
-    while not dateValidation(year, month, day):
-        print('Your date are out of range please enter again.')
-        year, month, day = map(int, input('Enter a date in date format: year month day. ').split(' '))
+    print(f"You've entered Coordinate ({lat}, {long}), Air Pressure {pressure} and Date {year}/{month}/{day}: ")
     print(f'\nPrediction of wind power is: {float(model.predict([[year, pressure, lat, long, month, day]])[0]):.3f}'
           f' mph')
     print(f'The R^2 score of our model is: {r2_score(y_test, y_pred)}\n')
@@ -103,7 +101,9 @@ def logisticRegressionModel(df):
     predicted_values = model.predict_proba(cords)[0]
     windyProb, lowProb, mediumProb, highProb = predicted_values[0] * 100, predicted_values[1] * 100, predicted_values[
         2] * 100, predicted_values[3] * 100
-    print(f'Coordinates ({lat}, {long}):\nA windy storm probability: {windyProb:.2f}%'
+    print(f"You've entered Coordinate ({lat}, {long}), Air Pressure {pressure}, Wind Power {wind} (from linear model)"
+          f" and Date {year}/{month}/{day}: ")
+    print(f'A windy storm probability: {windyProb:.2f}%'
           f'\nTropical Depression probability: {lowProb:.2f}%\n'
           f'Tropical Storm probability: {mediumProb:.2f}%\nA deadly storm probability: {highProb:.2f}%\n')
 
