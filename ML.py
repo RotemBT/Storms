@@ -137,10 +137,5 @@ def chooseModel():
 
 
 df = pd.read_csv('addingBeaufort.csv')
-bins = [0, 1, 3, 7, 12, 18, 24, 31, 38, 46, 54, 63, 72, 250]
-labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-# https://en.wikipedia.org/wiki/Beaufort_scale
-df['beaufort_scale'] = pd.cut(df['wind_power'], bins, labels=labels)
-df['Ocean'] = df['Ocean'].astype('category')
-df['ocean_code'] = df['Ocean'].cat.codes
+
 chooseModel()

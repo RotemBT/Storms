@@ -50,6 +50,13 @@ def sendToCSV(dataFrame, fileName):
     dataFrame.to_csv(fileName, index=False)
 
 
+def getDataFrame(stormsName, yearOfStorm, oceans, dates, hours, windPower, airPressure, stormType, latCorr, longCorr):
+    return pd.DataFrame(
+        pd.DataFrame({'storm_name': stormsName, 'year': yearOfStorm, 'Ocean': oceans, 'date': dates, 'time': hours,
+                      'wind_power': windPower,
+                      'air_pressure': airPressure, 'storm_type': stormType, 'lat': latCorr, 'long': longCorr}))
+
+
 def scrapData():
     for ocean, url in oceansURL.items():
         for i in range(LAST_YEAR, FIRST_YEAR, -1):
@@ -57,13 +64,6 @@ def scrapData():
                                   stormType, stormsName, latCorr, longCorr, url)
 
     driver.quit()
-
-
-def getDataFrame(stormsName, yearOfStorm, oceans, dates, hours, windPower, airPressure, stormType, latCorr, longCorr):
-    return pd.DataFrame(
-        pd.DataFrame({'storm_name': stormsName, 'year': yearOfStorm, 'Ocean': oceans, 'date': dates, 'time': hours,
-                      'wind_power': windPower,
-                      'air_pressure': airPressure, 'storm_type': stormType, 'lat': latCorr, 'long': longCorr}))
 
 
 def getStormRecords(soup, year, ocean, years, oceans, dates, hours, windPower, airPressure,

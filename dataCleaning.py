@@ -60,6 +60,17 @@ df.drop(df[df['wind_power'] <= 0].index, inplace=True)
 df.dropna(axis=0, inplace=True)
 # drop duplicates
 df.drop_duplicates()
+df[['Month', 'Day', 'year']] = df.date.str.split("/", expand=True)
+df.drop(['date'], axis=1, inplace=True)
+bins = [0, 1, 3, 7, 12, 18, 24, 31, 38, 46, 54, 63, 72, 250]
+labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+# https://en.wikipedia.org/wiki/Beaufort_scale
+df['beaufort_scale'] = pd.cut(df['wind_power'], bins, labels=labels)
+df['Ocean'] = df['Ocean'].astype('category')
+df['ocean_code'] = df['Ocean'].cat.codes
+
+print(df.info())
+
 print(df)
 df.to_csv('rotem1.csv', index=False)
 # take 14 min
