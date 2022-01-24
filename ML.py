@@ -68,9 +68,8 @@ def getWindFromLinearModel(df, lat, long, pressure, year, month, day):
     return round(float(model.predict([[year, pressure, lat, long, month, day]])[0]), 3)
 
 
-def logisticRegressionModel(df):
-    # Logistic Regression by beaufort split (windy ,low, med, high)
-    # divide our column
+def rearrangeBeaufortColumn(df):
+    df = df.copy()
     dfBeaufortScaleLessThan5 = df[df['beaufort_scale'] < 5].reset_index(drop=True)
     dfBeaufortScaleBetween5To8 = df[(df['beaufort_scale'] >= 5) & (df['beaufort_scale'] <= 8)].reset_index(drop=True)
     dfBeaufortScaleBetween9To11 = df[(df['beaufort_scale'] >= 9) & (df['beaufort_scale'] <= 11)].reset_index(drop=True)
@@ -80,9 +79,14 @@ def logisticRegressionModel(df):
     dfBeaufortScaleBetween9To11['beaufort'] = 2
     dfBeaufortScaleHigherThan12['beaufort'] = 3
 
-    df = pd.concat(
+    return pd.concat(
         [dfBeaufortScaleHigherThan12, dfBeaufortScaleBetween9To11, dfBeaufortScaleBetween5To8,
          dfBeaufortScaleLessThan5], ignore_index=True).drop(['beaufort_scale'], axis=1)
+
+
+def logisticRegressionModel(df):
+    # Logistic Regression by beaufort split (windy ,low, med, high)
+    df = rearrangeBeaufortColumn(df)
 
     # splitting the data
     X = df.loc[:, ~df.columns.isin(
