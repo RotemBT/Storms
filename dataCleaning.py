@@ -3,8 +3,6 @@ import time
 import numpy as np
 import pandas as pd
 
-df = pd.read_csv('stormsDate.csv')
-
 
 def windSpeedToPressure(windSpeedInMPH):
     windSpeedInMS = windSpeedInMPH * 0.44704
@@ -46,8 +44,7 @@ def fillMissingWindOrPressure(df, columnName, compareTo):
         df.loc[ind, columnName] = columnValues[columnValues != 0].median()
 
 
-start = time.time()
-
+df = pd.read_csv('storms.csv')
 # remove storms without lan and long coordinate.
 df.dropna(subset=['lat', 'long'], axis=0, inplace=True)
 # fill air_pressure column
@@ -72,6 +69,5 @@ df['ocean_code'] = df['Ocean'].cat.codes
 print(df.info())
 
 print(df)
-df.to_csv('rotem1.csv', index=False)
-# take 14 min
-print(f'The time is {time.time() - start}')
+df.to_csv('cleaningDF.csv', index=False)
+

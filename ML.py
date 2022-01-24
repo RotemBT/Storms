@@ -136,6 +136,6 @@ def chooseModel():
         userInput = int(input('Please enter number in the list.'))
 
 
-df = pd.read_csv('addingBeaufort.csv')
+df = pd.read_csv('cleaningDF.csv')
 
 chooseModel()
