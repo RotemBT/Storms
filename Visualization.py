@@ -5,7 +5,7 @@ from scipy.stats import pearsonr
 import plotly.express as px
 
 # load csv
-df = pd.read_csv("addingBeaufort.csv", header=0, sep=',')
+df = pd.read_csv("cleaningDF.csv", header=0, sep=',')
 print(df)
 
 # storm location map graph
