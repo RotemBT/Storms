@@ -1,5 +1,3 @@
-import re
-import requests
 import time
 import numpy as np
 import bs4
@@ -66,85 +64,6 @@ def getDataFrame(stormsName, yearOfStorm, oceans, dates, hours, windPower, airPr
         pd.DataFrame({'storm_name': stormsName, 'year': yearOfStorm, 'Ocean': oceans, 'date': dates, 'time': hours,
                       'wind_power': windPower,
                       'air_pressure': airPressure, 'storm_type': stormType, 'lat': latCorr, 'long': longCorr}))
-
-
-# Return bs4 instance
-def urlToScrap(url):
-    """
-    get instance of soup to scarp from current url
-    :param url: url to scrap
-    :return: instance of soup
-    """
-    r = requests.get(url)
-    return bs4.BeautifulSoup(r.content, 'html.parser')
-
-
-# Crawling from wikipedia
-def scrapFromWiki(yearCurr, soup, stormName, datesActive, stormCategory, maxMinWind, minPressure,
-                  damageUSD, deaths, year):
-    """
-    this function scrap from wikipedia.
-    link - https://en.wikipedia.org/wiki/Atlantic_hurricane_season
-    :param yearCurr: current year of storm
-    :param soup: get
-    :param stormName:
-    :param datesActive:
-    :param stormCategory:
-    :param maxMinWind:
-    :param minPressure:
-    :param damageUSD:
-    :param deaths:
-    :param year:
-    :return:
-    """
-    ourTable = soup.find_all('table', class_='wikitable')
-    trs = ourTable[-1].find_all("tr")
-    for tr in trs[1:-2]:
-        name = tr.find('th')
-        stormName.append(name.text.strip())
-        tData = tr.find_all("td")
-        datesActive.append(tData[0].text.strip())
-        stormCategory.append(tData[1].text.strip())
-        maxMinWind.append(tData[2].text.strip())
-        minPressure.append(tData[3].text.strip())
-        damageUSD.append(tData[5].text.strip())
-        deaths.append(tData[6].text.strip())
-        year.append(str(yearCurr))
-
-
-# Crawling general info from Wunderground
-def scrapGeneralInformationOfOcean(oceansURL):
-    years = []
-    storms = []
-    hurricanes = []
-    deaths = []
-    damagedUSD = []
-    oceans = []
-    for ocean, url in oceansURL.items():
-        soup = getSoupObj(url)
-        tdOfYear = soup.find_all('td',
-                                 class_='mat-cell cdk-cell cdk-column-year mat-column-year ng-star-inserted')
-        tdOfStorm = soup.find_all('td',
-                                  class_='mat-cell cdk-cell cdk-column-storms mat-column-storms ng-star-inserted')
-        tdOHurricanes = soup.find_all('td',
-                                      class_='mat-cell cdk-cell cdk-column-hurricanes mat-column-hurricanes'
-                                             ' ng-star-inserted')
-        tdOfDeaths = soup.find_all('td',
-                                   class_='mat-cell cdk-cell cdk-column-deaths mat-column-deaths ng-star-inserted')
-        tdOfDamagedUsd = soup.find_all('td',
-                                       class_='mat-cell cdk-cell cdk-column-damage mat-column-damage ng-star-inserted')
-        tdOfDamagedUsd = [damage.text for damage in tdOfDamagedUsd]
-        tdOfDamagedUsd = [re.sub("[^0-9]", "", str(damage)) for damage in tdOfDamagedUsd]
-        tdOfDeaths = [deaths.text for deaths in tdOfDeaths]
-        tdOfDeaths = [re.sub("[^0-9]", "", str(deaths)) for deaths in tdOfDeaths]
-        years.extend([year.text for year in tdOfYear])
-        storms.extend([storm.text for storm in tdOfStorm])
-        hurricanes.extend([hurricane.text for hurricane in tdOHurricanes])
-        deaths.extend(tdOfDeaths)
-        damagedUSD.extend(tdOfDamagedUsd)
-        oceans.extend([ocean] * len(tdOfYear))
-    return pd.DataFrame({'Years': years, 'Storms': storms, 'Hurricanes': hurricanes, 'Deaths': deaths,
-                         'DamageUSD': damagedUSD, 'Oceans': oceans})
 
 
 def getStormRecords(soup, year, ocean, years, oceans, dates, hours, windPower, airPressure,
@@ -291,4 +210,3 @@ def scrapDataFromCurrYear(year, ocean, years, oceans, dates, hours, windPower, a
                              stormType, stormNames, latCorr, longCorr)
     except:
         print(driver.current_url)
-
