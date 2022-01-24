@@ -87,16 +87,12 @@ def rearrangeBeaufortColumn(df):
 def logisticRegressionModel(df):
     # Logistic Regression by beaufort split (windy ,low, med, high)
     df = rearrangeBeaufortColumn(df)
-
-    # splitting the data
     X = df.loc[:, ~df.columns.isin(
         ['storm_name', 'time', 'storm_type', 'Ocean', 'ocean_code', 'beaufort'])]
     y = df['beaufort']
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=40)
-    # scaled our X
     scaler = MinMaxScaler(feature_range=(0, 1))
     X_train_scaled = scaler.fit_transform(X_train)
-    # build the model
     model = LogisticRegression().fit(X_train_scaled, y_train)
     y_pred = model.predict(scaler.transform(X_test))
     lat, long, pressure, year, month, day = getParams()
@@ -111,7 +107,6 @@ def logisticRegressionModel(df):
           f'\nTropical Depression probability: {lowProb:.2f}%\n'
           f'Tropical Storm probability: {mediumProb:.2f}%\nA deadly storm probability: {highProb:.2f}%\n')
 
-    # Evaluate our model
     print(f'The f1 score (average=micro) of our model is: {f1_score(y_test, y_pred, average="micro")}')
     print(f'The Accuracy rate of our model is: {metrics.accuracy_score(y_test, y_pred)}')
     print(f'The Precision rate (average=micro) of our model is: '
