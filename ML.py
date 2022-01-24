@@ -85,7 +85,7 @@ def rearrangeBeaufortColumn(df):
 
 
 def logisticRegressionModel(df):
-    # Logistic Regression by beaufort split (windy ,low, med, high)
+    # Logistic Regression by beaufort split (breeze ,low, med, high)
     df = rearrangeBeaufortColumn(df)
     X = df.loc[:, ~df.columns.isin(
         ['storm_name', 'time', 'storm_type', 'Ocean', 'ocean_code', 'beaufort'])]
@@ -99,11 +99,11 @@ def logisticRegressionModel(df):
     wind = getWindFromLinearModel(df, lat, long, pressure, year, month, day)
     cords = scaler.transform([[year, wind, pressure, lat, long, month, day]])
     predicted_values = model.predict_proba(cords)[0]
-    windyProb, lowProb, mediumProb, highProb = predicted_values[0] * 100, predicted_values[1] * 100, predicted_values[
+    breezeProb, lowProb, mediumProb, highProb = predicted_values[0] * 100, predicted_values[1] * 100, predicted_values[
         2] * 100, predicted_values[3] * 100
     print(f"You've entered Coordinate ({lat}, {long}), Air Pressure {pressure}, Wind Power {wind} (from linear model)"
           f" and Date {year}/{month}/{day}: ")
-    print(f'A windy storm probability: {windyProb:.2f}%'
+    print(f'A breeze storm probability: {breezeProb:.2f}%'
           f'\nTropical Depression probability: {lowProb:.2f}%\n'
           f'Tropical Storm probability: {mediumProb:.2f}%\nA deadly storm probability: {highProb:.2f}%\n')
 
