@@ -64,6 +64,9 @@ def scrapData():
                                   stormType, stormsName, latCorr, longCorr, url)
 
     driver.quit()
+    df = getDataFrame(stormsName, yearOfStorm, oceans, dates, hours, windPower, airPressure, stormType, latCorr,
+                      longCorr)
+    sendToCSV(df, 'storms.csv')
 
 
 def getStormRecords(soup, year, ocean, years, oceans, dates, hours, windPower, airPressure,
@@ -210,3 +213,6 @@ def scrapDataFromCurrYear(year, ocean, years, oceans, dates, hours, windPower, a
                              stormType, stormNames, latCorr, longCorr)
     except:
         print(driver.current_url)
+
+
+scrapData()
