@@ -20,7 +20,7 @@ We export our data to CSV file using Pandas library.<br>
 
 ## Data Cleaning
 We clean our data using Pandas library.<br>
-- Open data_cleaning
+- Open data_cleaning.ipynb
 - Import storms.csv
 - Run the program
 
