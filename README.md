@@ -30,6 +30,8 @@ We visualize our data with Plotly, Matplotlib and Seaborn libraies.<br>
 - Import cleaningDF.csv
 - Run the program
 
+![image](https://user-images.githubusercontent.com/76609543/151128659-e48ef260-c743-4d84-a692-480c9372e628.png)
+
 ## Machine Learning
 We builded our model using Sklearn library.<br>
 - Open ML.ipynb
